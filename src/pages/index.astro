@@ -1,0 +1,144 @@
+---
+import Base from "../layouts/Base.astro";
+import Rejilla from "../components/Rejilla.astro";
+import Tarjeta from "../components/Tarjeta.astro";
+import Vacio from "../components/Vacio.astro";
+import { obtenerIndice, obtenerPortada, obtenerUltimas, porHistoria } from "../lib/datos";
+import { grafoPortada } from "../lib/seo";
+import { SITIO } from "../lib/sitio";
+import { TTL } from "../lib/cache";
+import { colorVertical, enlaceVertical, nombreVertical, numero } from "../lib/formato";
+
+// Los tres son pequeños y están memorizados: la portada no toca ningún archivo
+// de noticias, que es lo que cuesta CPU de verdad.
+const [portada, ultimas, indice] = await Promise.all([
+  obtenerPortada(),
+  obtenerUltimas(),
+  obtenerIndice(),
+]);
+
+const historias = portada?.stories ?? [];
+
+// Todo sale de las historias ya agrupadas, nunca del listado en crudo: si tres
+// medios cuentan lo mismo, en el listado hay tres entradas y la portada
+// enseñaría tres veces la misma noticia. Cada bloque se reparte lo que el
+// anterior no usa, así que tampoco se repiten entre ellos.
+const apertura = historias.slice(0, 7);
+const restantes = historias.slice(7);
+
+// Aquí manda la hora, no cuántos medios la cuentan: es la columna de lo último.
+const titulares = [...restantes]
+  .sort((a, b) => (b.published_at ?? "").localeCompare(a.published_at ?? ""))
+  .slice(0, 8);
+
+const yaPuestas = new Set(titulares.map((h) => h.id));
+const resto = restantes.filter((h) => !yaPuestas.has(h.id)).slice(0, 12);
+
+// Lo que ya se ha enseñado arriba, para que las tiras por nicho no lo repitan.
+const vistas = new Set([...apertura, ...titulares, ...resto].map((h) => h.id));
+
+// Una tira corta por nicho, debajo del río. El río es lo que importa --todo
+// mezclado--, pero sin esto no habría forma de entrar a un nicho concreto
+// desde la portada.
+// `latest.json` viene sin agrupar: hay una tarjeta por medio. Se reduce a una
+// por historia antes de repartirlo, o el mismo titular saldría cuatro veces.
+const flujo = porHistoria(ultimas?.articles ?? []).filter((a) => !vistas.has(a.id));
+
+const nichos = (indice?.verticals ?? [])
+  .map((vertical) => ({
+    ...vertical,
+    articulos: flujo.filter((a) => a.vertical === vertical.vertical).slice(0, 4),
+  }))
+  .filter((n) => n.articulos.length > 0);
+---
+
+<Base
+  titulo={SITIO.titulo}
+  descripcion={SITIO.descripcion}
+  canonical="/"
+  indice={indice}
+  cache={TTL.paginaListado}
+  jsonLd={grafoPortada(historias, indice)}
+>
+  {
+    historias.length === 0 ? (
+      <Vacio
+        titulo="Todavía no hay nada que enseñar"
+        detalle="El archivo se está construyendo. Vuelve dentro de un rato."
+      />
+    ) : (
+      <>
+        <div class="mb-6 flex items-baseline justify-between gap-4 border-b border-[var(--color-linea)] pb-3">
+          <h1 class="font-display text-2xl font-extrabold tracking-tight">
+            Lo último, de todo
+          </h1>
+          {indice && (
+            <p class="shrink-0 text-xs text-[var(--color-tinta-tenue)]">
+              {numero(indice.total_articles)} noticias · {numero(indice.total_categories)} temas
+            </p>
+          )}
+        </div>
+
+        <div class="grid gap-7 lg:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)]">
+          <div>
+            <Rejilla articulos={apertura} conApertura columnas={2} />
+          </div>
+
+          <aside class="lg:border-l lg:border-[var(--color-linea)] lg:pl-6">
+            <h2 class="mb-3 font-display text-xs font-bold uppercase tracking-wider text-[var(--color-tinta-tenue)]">
+              Al minuto
+            </h2>
+            <div class="space-y-1">
+              {titulares.map((articulo) => (
+                <Tarjeta articulo={articulo} variante="titular" />
+              ))}
+            </div>
+          </aside>
+        </div>
+
+        {resto.length > 0 && (
+          <section class="mt-10">
+            <h2 class="mb-4 border-b border-[var(--color-linea)] pb-2 font-display text-lg font-extrabold tracking-tight">
+              Más historias
+            </h2>
+            <Rejilla articulos={resto} />
+          </section>
+        )}
+
+        {nichos.length > 0 && (
+          <section class="mt-12">
+            <h2 class="mb-4 border-b border-[var(--color-linea)] pb-2 font-display text-lg font-extrabold tracking-tight">
+              Por nicho
+            </h2>
+            <div class="grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
+              {nichos.map((nicho) => (
+                <div>
+                  <a
+                    href={enlaceVertical(nicho.vertical)}
+                    class="mb-3 flex items-baseline justify-between gap-2 border-b-2 pb-1.5"
+                    style={`border-color:${colorVertical(nicho.vertical)}`}
+                  >
+                    <span
+                      class="font-display text-sm font-extrabold uppercase tracking-wide"
+                      style={`color:${colorVertical(nicho.vertical)}`}
+                    >
+                      {nombreVertical(nicho.vertical)}
+                    </span>
+                    <span class="text-[0.7rem] text-[var(--color-tinta-tenue)]">
+                      {numero(nicho.articles)}
+                    </span>
+                  </a>
+                  <div class="space-y-3">
+                    {nicho.articulos.map((articulo) => (
+                      <Tarjeta articulo={articulo} variante="compacta" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </>
+    )
+  }
+</Base>

@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+@theme {
+  /* Grotesca ancha y pesada para titulares: un agregador universal necesita
+     que el titular pese más que la marca. */
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  /* El cuerpo de la noticia en serif: son textos largos y se leen mejor. */
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", ui-serif, serif;
+
+  --color-marca: #4f46e5;
+  --color-marca-claro: #eef0ff;
+  --color-marca-oscuro: #3730a3;
+
+  --color-tinta: #0f1115;
+  --color-tinta-suave: #4b5364;
+  --color-tinta-tenue: #7c8598;
+  --color-papel: #f6f7fa;
+  --color-lienzo: #ffffff;
+  --color-lienzo-alt: #eceff5;
+  --color-linea: #e0e4ec;
+
+  /* Un acento por nicho. Es lo que mantiene legible un río en el que se
+     mezcla todo: el color dice de qué va la noticia antes de leerla. */
+  --color-noticias: #2f6df6;
+  --color-deportes: #12a150;
+  --color-gamer: #8b5cf6;
+  --color-tecnologia: #0e9bb8;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html.oscuro {
+    color-scheme: dark;
+
+    --color-marca: #8b8cff;
+    --color-marca-claro: #1c1b3a;
+    --color-marca-oscuro: #a5a6ff;
+
+    --color-tinta: #eef1f7;
+    --color-tinta-suave: #a5aec0;
+    --color-tinta-tenue: #79839a;
+    --color-papel: #08090c;
+    --color-lienzo: #12141a;
+    --color-lienzo-alt: #1a1e26;
+    --color-linea: #262c37;
+
+    --color-noticias: #6f9bff;
+    --color-deportes: #3ecf7f;
+    --color-gamer: #b18cff;
+    --color-tecnologia: #3fc4de;
+  }
+
+  body {
+    background-color: var(--color-papel);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-marca);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-marca);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Las imágenes vienen de sitios distintos y con proporciones dispares: sin
+     esto, una sola foto vertical descuadra la fila entera de la rejilla. */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@utility contenedor {
+  margin-inline: auto;
+  max-width: 82rem;
+  padding-inline: 1.25rem;
+}
+
+/* Recorte de líneas para titulares y entradillas. */
+@utility lineas-* {
+  display: -webkit-box;
+  -webkit-line-clamp: --value(integer);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* El cuerpo de una noticia: medida de lectura cómoda y ritmo vertical. */
+@utility prosa {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: var(--color-tinta);
+
+  & > p {
+    margin-block: 0 1.25em;
+  }
+
+  & > p:first-of-type::first-letter {
+    float: left;
+    font-family: var(--font-display);
+    font-size: 3.4em;
+    line-height: 0.82;
+    padding-right: 0.08em;
+    font-weight: 800;
+    color: var(--color-marca);
+  }
+}
+
+/* Franja de color del nicho, sin tener que pintar cada variante a mano. */
+@utility barra-nicho {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--acento, var(--color-marca));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

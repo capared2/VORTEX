@@ -1,0 +1,107 @@
+---
+import Base from "../../layouts/Base.astro";
+import Rejilla from "../../components/Rejilla.astro";
+import Paginacion from "../../components/Paginacion.astro";
+import Vacio from "../../components/Vacio.astro";
+import { obtenerIndice, obtenerPaginaTema } from "../../lib/datos";
+import { grafoTema } from "../../lib/seo";
+import { SITIO } from "../../lib/sitio";
+import { TTL } from "../../lib/cache";
+import {
+  VERTICALES,
+  colorVertical,
+  enlaceCategoria,
+  enlaceVertical,
+  nombreTema,
+  nombreVertical,
+  numero,
+} from "../../lib/formato";
+
+const { vertical, tema } = Astro.params;
+
+if (!vertical || !tema || !(vertical in VERTICALES)) {
+  return new Response(null, { status: 404 });
+}
+
+const clave = `${vertical}/${tema}`;
+const indice = await obtenerIndice();
+const categoria = (indice?.categories ?? []).find((c) => c.category === clave);
+
+// Un tema que no existe en el archivo tiene que devolver 404, no una página
+// vacía: si no, cualquier URL inventada acabaría indexada.
+if (!categoria) {
+  return new Response(null, { status: 404 });
+}
+
+const POR_PAGINA = 18;
+const pagina = Math.max(1, Number(Astro.url.searchParams.get("p") ?? 1) || 1);
+const resultado = await obtenerPaginaTema(categoria, pagina, POR_PAGINA);
+
+const nombre = nombreTema(clave);
+const acento = colorVertical(vertical);
+const hermanos = (indice?.categories ?? [])
+  .filter((c) => c.vertical === vertical && c.category !== clave)
+  .slice(0, 12);
+---
+
+<Base
+  titulo={`${nombre} · ${SITIO.nombre}`}
+  descripcion={`Últimas noticias de ${nombre.toLowerCase()}, reunidas y ordenadas en ${SITIO.nombre}.`}
+  canonical={enlaceCategoria(clave, resultado.pagina)}
+  indice={indice}
+  verticalActiva={vertical}
+  cache={TTL.paginaListado}
+  jsonLd={grafoTema(clave, resultado.articulos, resultado.pagina)}
+  anterior={resultado.pagina > 1 ? enlaceCategoria(clave, resultado.pagina - 1) : null}
+  siguiente={resultado.pagina < resultado.paginas ? enlaceCategoria(clave, resultado.pagina + 1) : null}
+>
+  <nav aria-label="Migas de pan" class="mb-3 text-xs text-[var(--color-tinta-tenue)]">
+    <a href="/" class="hover:text-[var(--color-marca)]">Inicio</a>
+    <span class="mx-1.5">›</span>
+    <a href={enlaceVertical(vertical)} class="hover:text-[var(--color-marca)]">
+      {nombreVertical(vertical)}
+    </a>
+  </nav>
+
+  <header class="mb-6 border-b-2 pb-3" style={`border-color:${acento}`}>
+    <h1 class="font-display text-3xl font-extrabold tracking-tight">{nombre}</h1>
+    <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
+      {numero(resultado.total)} noticias
+    </p>
+  </header>
+
+  {
+    resultado.articulos.length === 0 ? (
+      <Vacio titulo="Todavía no hay noticias en este tema" />
+    ) : (
+      <>
+        <Rejilla articulos={resultado.articulos} conApertura={resultado.pagina === 1} />
+        <Paginacion
+          pagina={resultado.pagina}
+          paginas={resultado.paginas}
+          enlace={(p) => enlaceCategoria(clave, p)}
+        />
+      </>
+    )
+  }
+
+  {
+    hermanos.length > 0 && (
+      <nav aria-label={`Otros temas de ${nombreVertical(vertical)}`} class="mt-10 border-t border-[var(--color-linea)] pt-5">
+        <h2 class="mb-3 font-display text-xs font-bold uppercase tracking-wider text-[var(--color-tinta-tenue)]">
+          Más de {nombreVertical(vertical)}
+        </h2>
+        <div class="flex flex-wrap gap-2">
+          {hermanos.map((hermano) => (
+            <a
+              href={enlaceCategoria(hermano.category)}
+              class="rounded-full border border-[var(--color-linea)] px-3 py-1 text-xs font-medium text-[var(--color-tinta-suave)] transition hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
+            >
+              {nombreTema(hermano.category)}
+            </a>
+          ))}
+        </div>
+      </nav>
+    )
+  }
+</Base>

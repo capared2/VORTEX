@@ -1,0 +1,99 @@
+---
+import Base from "../layouts/Base.astro";
+import Tarjeta from "../components/Tarjeta.astro";
+import Vacio from "../components/Vacio.astro";
+import { obtenerIndice, obtenerUltimas, porHistoria } from "../lib/datos";
+import { SITIO } from "../lib/sitio";
+import { TTL } from "../lib/cache";
+
+/**
+ * Búsqueda sobre lo reciente.
+ *
+ * Solo mira `latest.json`, que ya está memorizado: buscar en el archivo entero
+ * significaría descargar y parsear cientos de ficheros por consulta, y el
+ * presupuesto es de 10 ms de CPU. Para el archivo completo están los temas.
+ */
+const consulta = (Astro.url.searchParams.get("q") ?? "").trim();
+
+const [indice, ultimas] = await Promise.all([obtenerIndice(), obtenerUltimas()]);
+
+function normalizar(texto: string): string {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+const terminos = normalizar(consulta).split(/\s+/).filter((t) => t.length > 1);
+
+const resultados = terminos.length
+  ? porHistoria(ultimas?.articles ?? [])
+      .map((articulo) => {
+        const titulo = normalizar(articulo.title);
+        const cuerpo = normalizar(`${articulo.standfirst} ${articulo.summary}`);
+        // El titular pesa más que la entradilla: si el término está ahí, la
+        // noticia va de eso y no lo menciona de pasada.
+        const puntos = terminos.reduce(
+          (suma, termino) =>
+            suma + (titulo.includes(termino) ? 3 : 0) + (cuerpo.includes(termino) ? 1 : 0),
+          0,
+        );
+        return { articulo, puntos };
+      })
+      .filter((r) => r.puntos > 0)
+      .sort((a, b) => b.puntos - a.puntos || (b.articulo.published_at ?? "").localeCompare(a.articulo.published_at ?? ""))
+      .map((r) => r.articulo)
+      .slice(0, 40)
+  : [];
+---
+
+<Base
+  titulo={consulta ? `"${consulta}" · Buscar en ${SITIO.nombre}` : `Buscar · ${SITIO.nombre}`}
+  descripcion={`Busca entre lo último publicado en ${SITIO.nombre}.`}
+  canonical="/buscar"
+  indice={indice}
+  cache={TTL.paginaListado}
+  noindex
+>
+  <header class="mb-6">
+    <h1 class="font-display text-3xl font-extrabold tracking-tight">Buscar</h1>
+    <form action="/buscar" method="get" role="search" class="mt-4 flex gap-2">
+      <label for="consulta" class="sr-only">Qué buscar</label>
+      <input
+        id="consulta"
+        type="search"
+        name="q"
+        value={consulta}
+        placeholder="Escribe una palabra o un nombre"
+        autofocus
+        class="w-full rounded-lg border border-[var(--color-linea)] bg-[var(--color-lienzo)] px-4 py-2.5 outline-none transition focus:border-[var(--color-marca)]"
+      />
+      <button
+        type="submit"
+        class="shrink-0 rounded-lg bg-[var(--color-marca)] px-5 py-2.5 font-semibold text-white transition hover:bg-[var(--color-marca-oscuro)]"
+      >
+        Buscar
+      </button>
+    </form>
+    <p class="mt-2 text-xs text-[var(--color-tinta-tenue)]">
+      La búsqueda mira lo publicado más recientemente. Para el archivo completo, entra por
+      <a href="/temas" class="underline hover:text-[var(--color-marca)]">los temas</a>.
+    </p>
+  </header>
+
+  {
+    !consulta ? null : resultados.length === 0 ? (
+      <Vacio
+        titulo={`Nada para "${consulta}"`}
+        detalle="Prueba con otra palabra, o mira los temas para recorrer el archivo."
+      />
+    ) : (
+      <>
+        <p class="mb-4 text-sm text-[var(--color-tinta-suave)]">
+          {resultados.length} {resultados.length === 1 ? "resultado" : "resultados"} para
+          <strong class="font-semibold">"{consulta}"</strong>
+        </p>
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {resultados.map((articulo) => <Tarjeta articulo={articulo} />)}
+        </div>
+      </>
+    )
+  }
+</Base>

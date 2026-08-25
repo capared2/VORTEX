@@ -1,0 +1,121 @@
+---
+import "../styles/global.css";
+import Cabecera from "../components/Cabecera.astro";
+import Pie from "../components/Pie.astro";
+import Seo from "../components/Seo.astro";
+import type { Indice } from "../lib/types";
+import { SITIO } from "../lib/sitio";
+
+interface Props {
+  titulo: string;
+  descripcion?: string;
+  /** Ruta canónica de esta página. */
+  canonical: string;
+  indice: Indice | null;
+  /** Segundos que el edge de Cloudflare puede reutilizar la respuesta. */
+  cache?: number;
+  /**
+   * Idioma de esta página. El archivo reúne noticias en varios idiomas, y
+   * declararlas todas como españolas confunde a los buscadores y hace que un
+   * lector de pantalla las lea con la fonética equivocada.
+   */
+  idioma?: string;
+  verticalActiva?: string;
+  imagen?: string | null;
+  tipo?: "website" | "article";
+  publicado?: string | null;
+  modificado?: string | null;
+  seccion?: string;
+  etiquetas?: string[];
+  noindex?: boolean;
+  jsonLd?: object[];
+  anterior?: string | null;
+  siguiente?: string | null;
+}
+
+const {
+  titulo,
+  descripcion = SITIO.descripcion,
+  canonical,
+  indice,
+  cache = 900,
+  idioma = SITIO.idioma,
+  verticalActiva,
+  ...seo
+} = Astro.props;
+
+// El dataset se regenera cada dos horas: servir desde el edge y revalidar en
+// segundo plano mantiene el sitio rápido sin quedarse obsoleto.
+Astro.response.headers.set(
+  "Cache-Control",
+  `public, max-age=60, s-maxage=${cache}, stale-while-revalidate=86400`,
+);
+---
+
+<!doctype html>
+<html lang={idioma}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Seo titulo={titulo} descripcion={descripcion} canonical={canonical} idioma={idioma} {...seo} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#4f46e5" />
+
+    <script is:inline>
+      // Si una foto no llega, se quita del flujo en vez de enseñar el icono
+      // de imagen rota. Pasan por el proxy del propio sitio, pero el original
+      // puede haber desaparecido. Se oculta con `display` y no con
+      // `visibility` porque, si no, la foto de apertura de una noticia deja un
+      // hueco en blanco de más de quinientos píxeles antes del texto; y se
+      // oculta el `<figure>` entero para no dejar el pie huérfano.
+      addEventListener(
+        "error",
+        (evento) => {
+          const elemento = evento.target;
+          if (!(elemento instanceof HTMLImageElement)) return;
+          // Se retira el contenedor entero --el `<figure>` de la noticia o el
+          // hueco de la foto en una tarjeta--, no solo la imagen: si no, la
+          // apertura se queda con media tarjeta en blanco.
+          const contenedor = elemento.closest("figure, [data-foto]") ?? elemento;
+          contenedor.style.display = "none";
+        },
+        true,
+      );
+
+      // El tema se aplica antes de pintar para que no haya destello.
+      try {
+        const guardado = localStorage.getItem("tema");
+        const oscuro = guardado
+          ? guardado === "oscuro"
+          : matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle("oscuro", oscuro);
+      } catch {
+        // Almacenamiento bloqueado: se queda con el tema del sistema.
+      }
+    </script>
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:bg-[var(--color-marca)] focus:px-4 focus:py-2 focus:text-white"
+    >
+      Ir al contenido
+    </a>
+
+    <Cabecera indice={indice} verticalActiva={verticalActiva} />
+
+    <main id="contenido" class="contenedor w-full flex-1 py-7">
+      <slot />
+    </main>
+
+    <Pie indice={indice} />
+  </body>
+</html>

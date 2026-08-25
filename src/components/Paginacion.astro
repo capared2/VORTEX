@@ -1,0 +1,76 @@
+---
+interface Props {
+  pagina: number;
+  paginas: number;
+  /** Construye la ruta de una página concreta. */
+  enlace: (pagina: number) => string;
+}
+
+const { pagina, paginas, enlace } = Astro.props;
+
+// Una ventana corta alrededor de la página actual: con miles de páginas, pintar
+// todas es una lista inservible y un montón de enlaces que diluyen el rastreo.
+const desde = Math.max(1, pagina - 2);
+const hasta = Math.min(paginas, pagina + 2);
+const numeros = Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i);
+---
+
+{
+  paginas > 1 && (
+    <nav aria-label="Paginación" class="mt-8 flex flex-wrap items-center justify-center gap-1.5">
+      {pagina > 1 && (
+        <a
+          href={enlace(pagina - 1)}
+          rel="prev"
+          class="rounded-md border border-[var(--color-linea)] px-3 py-1.5 text-sm font-medium transition hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
+        >
+          Anterior
+        </a>
+      )}
+
+      {desde > 1 && (
+        <>
+          <a href={enlace(1)} class="rounded-md px-3 py-1.5 text-sm hover:text-[var(--color-marca)]">1</a>
+          <span class="px-1 text-[var(--color-tinta-tenue)]">…</span>
+        </>
+      )}
+
+      {numeros.map((numero) =>
+        numero === pagina ? (
+          <span
+            aria-current="page"
+            class="rounded-md bg-[var(--color-marca)] px-3 py-1.5 text-sm font-semibold text-white"
+          >
+            {numero}
+          </span>
+        ) : (
+          <a
+            href={enlace(numero)}
+            class="rounded-md px-3 py-1.5 text-sm transition hover:text-[var(--color-marca)]"
+          >
+            {numero}
+          </a>
+        ),
+      )}
+
+      {hasta < paginas && (
+        <>
+          <span class="px-1 text-[var(--color-tinta-tenue)]">…</span>
+          <a href={enlace(paginas)} class="rounded-md px-3 py-1.5 text-sm hover:text-[var(--color-marca)]">
+            {paginas}
+          </a>
+        </>
+      )}
+
+      {pagina < paginas && (
+        <a
+          href={enlace(pagina + 1)}
+          rel="next"
+          class="rounded-md border border-[var(--color-linea)] px-3 py-1.5 text-sm font-medium transition hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
+        >
+          Siguiente
+        </a>
+      )}
+    </nav>
+  )
+}

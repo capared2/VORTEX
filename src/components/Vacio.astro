@@ -1,0 +1,18 @@
+---
+interface Props {
+  titulo: string;
+  detalle?: string;
+}
+const { titulo, detalle } = Astro.props;
+---
+
+<div class="rounded-xl border border-dashed border-[var(--color-linea)] bg-[var(--color-lienzo)] px-6 py-14 text-center">
+  <p class="font-display text-lg font-bold">{titulo}</p>
+  {detalle && <p class="mx-auto mt-2 max-w-md text-sm text-[var(--color-tinta-suave)]">{detalle}</p>}
+  <a
+    href="/"
+    class="mt-5 inline-block rounded-md bg-[var(--color-marca)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--color-marca-oscuro)]"
+  >
+    Ir a la portada
+  </a>
+</div>

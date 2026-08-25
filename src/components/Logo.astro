@@ -1,0 +1,16 @@
+---
+interface Props {
+  clase?: string;
+}
+const { clase = "h-7 w-auto" } = Astro.props;
+---
+
+<svg class={clase} viewBox="0 0 40 40" role="img" aria-label="Gigantum" fill="none">
+  <rect width="40" height="40" rx="9" fill="var(--color-marca)"></rect>
+  <!-- Cuatro trazos que convergen: los cuatro nichos en un solo río. -->
+  <path
+    d="M9 11h22M13 20h18M17 29h14"
+    stroke="#fff"
+    stroke-width="3.4"
+    stroke-linecap="round"></path>
+</svg>

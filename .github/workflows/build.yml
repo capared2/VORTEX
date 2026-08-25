@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Comprobar tipos
+        run: npm run check
+
+      - name: Construir el sitio
+        run: npm run build
+
+      # Comprueba que el resultado es un worker desplegable: sin esto, un build
+      # correcto puede seguir sin publicar nada útil.
+      - name: Comprobar que el worker se puede desplegar
+        run: npm run check:deploy

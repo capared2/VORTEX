@@ -1,0 +1,91 @@
+---
+import Base from "../../layouts/Base.astro";
+import Rejilla from "../../components/Rejilla.astro";
+import Paginacion from "../../components/Paginacion.astro";
+import Vacio from "../../components/Vacio.astro";
+import { obtenerIndice, obtenerPaginaVertical } from "../../lib/datos";
+import { grafoVertical } from "../../lib/seo";
+import { SITIO } from "../../lib/sitio";
+import { TTL } from "../../lib/cache";
+import {
+  VERTICALES,
+  colorVertical,
+  enlaceCategoria,
+  enlaceVertical,
+  nombreTema,
+  nombreVertical,
+  numero,
+} from "../../lib/formato";
+
+const { vertical } = Astro.params;
+
+// Solo los cuatro nichos son válidos aquí. Sin esta comprobación, cualquier
+// ruta de un segmento entraría en esta página y devolvería un 200 vacío, que
+// para un buscador es peor que un 404.
+if (!vertical || !(vertical in VERTICALES)) {
+  return new Response(null, { status: 404 });
+}
+
+const indice = await obtenerIndice();
+const temas = (indice?.categories ?? []).filter((c) => c.vertical === vertical);
+
+if (temas.length === 0) {
+  return new Response(null, { status: 404 });
+}
+
+const POR_PAGINA = 18;
+const pagina = Math.max(1, Number(Astro.url.searchParams.get("p") ?? 1) || 1);
+const resultado = await obtenerPaginaVertical(temas, pagina, POR_PAGINA);
+
+const nombre = nombreVertical(vertical);
+const acento = colorVertical(vertical);
+---
+
+<Base
+  titulo={`${nombre} · ${SITIO.nombre}`}
+  descripcion={`Todo lo de ${nombre.toLowerCase()} reunido y ordenado por temas en ${SITIO.nombre}.`}
+  canonical={enlaceVertical(vertical, resultado.pagina)}
+  indice={indice}
+  verticalActiva={vertical}
+  cache={TTL.paginaListado}
+  jsonLd={grafoVertical(vertical, resultado.articulos, temas, resultado.pagina)}
+  anterior={resultado.pagina > 1 ? enlaceVertical(vertical, resultado.pagina - 1) : null}
+  siguiente={resultado.pagina < resultado.paginas ? enlaceVertical(vertical, resultado.pagina + 1) : null}
+>
+  <header class="mb-5 border-b-2 pb-3" style={`border-color:${acento}`}>
+    <p class="text-xs font-bold uppercase tracking-wider" style={`color:${acento}`}>Nicho</p>
+    <h1 class="font-display text-3xl font-extrabold tracking-tight">{nombre}</h1>
+    <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
+      {numero(resultado.total)} noticias en {temas.length} temas
+    </p>
+  </header>
+
+  <nav aria-label={`Temas de ${nombre}`} class="mb-6 flex flex-wrap gap-2">
+    {
+      temas.map((tema) => (
+        <a
+          href={enlaceCategoria(tema.category)}
+          class="rounded-full border border-[var(--color-linea)] px-3 py-1 text-xs font-medium text-[var(--color-tinta-suave)] transition hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
+        >
+          {nombreTema(tema.category)}
+          <span class="ml-1 text-[var(--color-tinta-tenue)]">{numero(tema.articles)}</span>
+        </a>
+      ))
+    }
+  </nav>
+
+  {
+    resultado.articulos.length === 0 ? (
+      <Vacio titulo="Todavía no hay noticias en este nicho" />
+    ) : (
+      <>
+        <Rejilla articulos={resultado.articulos} conApertura={resultado.pagina === 1} />
+        <Paginacion
+          pagina={resultado.pagina}
+          paginas={resultado.paginas}
+          enlace={(p) => enlaceVertical(vertical, p)}
+        />
+      </>
+    )
+  }
+</Base>

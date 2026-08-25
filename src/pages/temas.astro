@@ -1,0 +1,78 @@
+---
+import Base from "../layouts/Base.astro";
+import { obtenerIndice } from "../lib/datos";
+import { grafoTemas } from "../lib/seo";
+import { SITIO } from "../lib/sitio";
+import { TTL } from "../lib/cache";
+import {
+  colorVertical,
+  enlaceCategoria,
+  enlaceVertical,
+  nombreTema,
+  nombreVertical,
+  numero,
+} from "../lib/formato";
+
+const indice = await obtenerIndice();
+const verticales = indice?.verticals ?? [];
+---
+
+<Base
+  titulo={`Todos los temas · ${SITIO.nombre}`}
+  descripcion={`Los ${indice?.total_categories ?? 0} temas en los que se organiza ${SITIO.nombre}, repartidos entre sus nichos.`}
+  canonical="/temas"
+  indice={indice}
+  cache={TTL.paginaListado}
+  jsonLd={grafoTemas(indice)}
+>
+  <header class="mb-7 border-b border-[var(--color-linea)] pb-3">
+    <h1 class="font-display text-3xl font-extrabold tracking-tight">Todos los temas</h1>
+    {
+      indice && (
+        <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
+          {numero(indice.total_articles)} noticias repartidas en {numero(indice.total_categories)} temas
+        </p>
+      )
+    }
+  </header>
+
+  <div class="space-y-9">
+    {
+      verticales.map((vertical) => {
+        const temas = (indice?.categories ?? []).filter((c) => c.vertical === vertical.vertical);
+        const acento = colorVertical(vertical.vertical);
+        return (
+          <section>
+            <h2 class="mb-3 border-b-2 pb-1.5" style={`border-color:${acento}`}>
+              <a
+                href={enlaceVertical(vertical.vertical)}
+                class="font-display text-xl font-extrabold tracking-tight hover:opacity-80"
+                style={`color:${acento}`}
+              >
+                {nombreVertical(vertical.vertical)}
+              </a>
+              <span class="ml-2 text-xs font-normal text-[var(--color-tinta-tenue)]">
+                {numero(vertical.articles)} noticias
+              </span>
+            </h2>
+            <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {temas.map((tema) => (
+                <li>
+                  <a
+                    href={enlaceCategoria(tema.category)}
+                    class="flex items-baseline justify-between gap-3 rounded-lg border border-[var(--color-linea)] bg-[var(--color-lienzo)] px-3.5 py-2.5 transition hover:border-[var(--color-marca)]"
+                  >
+                    <span class="font-medium">{nombreTema(tema.category)}</span>
+                    <span class="shrink-0 text-xs text-[var(--color-tinta-tenue)]">
+                      {numero(tema.articles)}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })
+    }
+  </div>
+</Base>
