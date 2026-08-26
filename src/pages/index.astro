@@ -68,16 +68,34 @@ const nichos = (indice?.verticals ?? [])
       />
     ) : (
       <>
-        <div class="mb-6 flex items-baseline justify-between gap-4 border-b border-[var(--color-linea)] pb-3">
-          <h1 class="font-display text-2xl font-extrabold tracking-tight">
-            Latest, from everywhere
-          </h1>
-          {indice && (
-            <p class="shrink-0 text-xs text-[var(--color-tinta-tenue)]">
-              {numero(indice.total_articles)} stories · {numero(indice.total_categories)} topics
-            </p>
-          )}
-        </div>
+        <!--
+          La portada lleva la misma portadilla que las secciones, pero con las
+          cuatro rayas de color en vez de una: aquí no manda ningún nicho, que
+          es justo de lo que va el sitio.
+        -->
+        <header class="mb-6 border-b border-[var(--color-linea)] pb-3">
+          <div class="flex h-1 gap-0.5" aria-hidden="true">
+            {(indice?.verticals ?? []).map((v) => (
+              <span class="flex-1" style={`background:${colorVertical(v.vertical)}`} />
+            ))}
+          </div>
+          <div class="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h1 class="font-display text-[2rem] font-black leading-none tracking-[-0.03em]">
+              Latest, from everywhere
+            </h1>
+            {indice && (
+              <p class="text-sm text-[var(--color-tinta-tenue)]">
+                <span class="font-semibold text-[var(--color-tinta-suave)]">
+                  {numero(indice.total_articles)}
+                </span> stories
+                <span class="mx-1.5 opacity-40">/</span>
+                <span class="font-semibold text-[var(--color-tinta-suave)]">
+                  {numero(indice.total_categories)}
+                </span> topics
+              </p>
+            )}
+          </div>
+        </header>
 
         <div class="grid gap-7 lg:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)]">
           <div>

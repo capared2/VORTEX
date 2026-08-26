@@ -1,6 +1,6 @@
 ---
 import type { Indice } from "../lib/types";
-import Logo from "./Logo.astro";
+import Marca from "./Marca.astro";
 import { SITIO } from "../lib/sitio";
 import {
   colorCategoria,
@@ -18,50 +18,68 @@ interface Props {
 
 const { indice } = Astro.props;
 const verticales = indice?.verticals ?? [];
+const nichos = verticales.length
+  ? verticales.map((v) => v.vertical)
+  : ["news", "sports", "gaming", "tech"];
 const año = new Date().getFullYear();
 ---
 
-<footer class="mt-10 border-t border-[var(--color-linea)] bg-[var(--color-lienzo)]">
-  <div class="contenedor grid gap-8 py-10 md:grid-cols-[1.4fr_2fr]">
+<!--
+  El pie cierra la página, así que va en oscuro aunque el sitio esté en claro.
+
+  Antes era blanco sobre blanco con cuatro columnas de enlaces: no cerraba
+  nada, parecía que el contenido se acababa por falta de noticias. Un fondo
+  firme dice "hasta aquí" y de paso deja que los colores de sección brillen,
+  que sobre blanco quedaban lavados.
+
+  Repite el filete de cuatro colores de la cabecera: es lo que ata las dos
+  puntas de la página.
+-->
+<footer class="mt-14 bg-[var(--color-cierre)] text-[var(--color-cierre-tinta)]">
+  <div class="flex h-[3px]" aria-hidden="true">
+    {nichos.map((clave) => <span class="flex-1" style={`background:${colorVertical(clave)}`} />)}
+  </div>
+
+  <div class="contenedor grid gap-10 py-12 lg:grid-cols-[1.1fr_2fr]">
     <div>
-      <div class="flex items-center gap-2.5">
-        <Logo id="pie" />
-        <span class="font-display text-lg font-extrabold tracking-tight">{SITIO.nombre}</span>
-      </div>
-      <p class="mt-3 max-w-sm text-sm leading-relaxed text-[var(--color-tinta-suave)]">
+      <a href="/" class="inline-block text-white" aria-label={`${SITIO.nombre}, go to the front page`}>
+        <Marca tamano="pie" />
+      </a>
+      <p class="mt-4 max-w-xs text-sm leading-relaxed opacity-70">
         {SITIO.descripcion}
       </p>
       {
         indice && (
-          <p class="mt-3 text-xs text-[var(--color-tinta-tenue)]">
-            {numero(indice.total_articles)} stories across {numero(indice.total_categories)} topics.
+          <p class="mt-5 font-display text-sm font-bold">
+            {numero(indice.total_articles)}
+            <span class="ml-1 text-xs font-medium uppercase tracking-wider opacity-60">
+              stories
+            </span>
+            <span class="mx-2 opacity-30">/</span>
+            {numero(indice.total_categories)}
+            <span class="ml-1 text-xs font-medium uppercase tracking-wider opacity-60">topics</span>
           </p>
         )
       }
     </div>
 
-    <nav aria-label="Sections" class="grid grid-cols-2 gap-6 sm:grid-cols-4">
+    <nav aria-label="Sections" class="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
       {
         verticales.map((vertical) => (
           <div>
-            <h2 class="font-display text-xs font-bold uppercase tracking-wider">
-              <a
-                href={enlaceVertical(vertical.vertical)}
-                class="hover:brightness-110"
-                style={`color:${colorVertical(vertical.vertical)}`}
-              >
-                {nombreVertical(vertical.vertical)}
-              </a>
+            <h2 class="border-b pb-2 font-display text-[0.7rem] font-extrabold uppercase tracking-[0.12em]"
+                style={`color:${colorVertical(vertical.vertical)};border-color:${colorVertical(vertical.vertical)}`}>
+              <a href={enlaceVertical(vertical.vertical)}>{nombreVertical(vertical.vertical)}</a>
             </h2>
-            <ul class="mt-2 space-y-1.5">
+            <ul class="mt-3 space-y-2">
               {(indice?.categories ?? [])
                 .filter((c) => c.vertical === vertical.vertical)
-                .slice(0, 6)
+                .slice(0, 7)
                 .map((c) => (
                   <li>
                     <a
                       href={enlaceCategoria(c.category)}
-                      class="enlace-tema text-sm text-[var(--color-tinta-suave)]"
+                      class="enlace-tema text-sm opacity-75"
                       style={`--acento:${colorCategoria(c.category)}`}
                     >
                       {nombreTema(c.category)}
@@ -75,19 +93,23 @@ const año = new Date().getFullYear();
     </nav>
   </div>
 
-  <div class="border-t border-[var(--color-linea)]">
-    <div class="contenedor flex flex-col gap-3 py-5 text-xs text-[var(--color-tinta-tenue)] sm:flex-row sm:items-center sm:justify-between">
-      <p>© {año} {SITIO.nombre}</p>
-      <nav aria-label="Footer links" class="flex flex-wrap gap-4">
-        <a href="/topics" class="hover:text-[var(--color-marca)]">Topics</a>
-        <a href="/search" class="hover:text-[var(--color-marca)]">Search</a>
-        <a href="/rss.xml" class="hover:text-[var(--color-marca)]">RSS</a>
-        <a href="/sitemap.xml" class="hover:text-[var(--color-marca)]">Sitemap</a>
+  <div class="border-t border-white/10">
+    <div
+      class="contenedor flex flex-col gap-4 py-6 text-xs sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p class="opacity-55">© {año} {SITIO.nombre}</p>
+      <nav aria-label="Footer links" class="flex flex-wrap gap-5">
+        <a href="/topics" class="opacity-75 transition hover:opacity-100">Topics</a>
+        <a href="/search" class="opacity-75 transition hover:opacity-100">Search</a>
+        <a href="/rss.xml" class="opacity-75 transition hover:opacity-100">RSS</a>
+        <a href="/sitemap.xml" class="opacity-75 transition hover:opacity-100">Sitemap</a>
       </nav>
     </div>
-    <p class="contenedor pb-6 text-xs leading-relaxed text-[var(--color-tinta-tenue)]">
-      Content gathered automatically from external sources and reorganised by topic.
-      Rights to each text belong to whoever originally published it.
-    </p>
+    <div class="contenedor pb-8">
+      <p class="max-w-3xl text-xs leading-relaxed opacity-45">
+        Content gathered automatically from external sources and reorganised by topic.
+        Rights to each text belong to whoever originally published it.
+      </p>
+    </div>
   </div>
 </footer>

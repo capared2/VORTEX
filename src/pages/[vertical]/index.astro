@@ -58,28 +58,43 @@ const acento = colorVertical(vertical);
   anterior={resultado.pagina > 1 ? enlaceVertical(vertical, resultado.pagina - 1) : null}
   siguiente={resultado.pagina < resultado.paginas ? enlaceVertical(vertical, resultado.pagina + 1) : null}
 >
-  <header class="banda-tema mb-5" style={`--acento:${acento}`}>
-    <p class="text-xs font-bold uppercase tracking-wider" style={`color:${acento}`}>Section</p>
-    <h1 class="font-display text-3xl font-extrabold tracking-tight">{nombre}</h1>
-    <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
-      {numero(resultado.total)} stories across {temas.length} topics
-    </p>
-  </header>
+  <!--
+    Portadilla de sección, no una caja con un rótulo.
 
-  <nav aria-label={`${nombre} topics`} class="mb-6 flex flex-wrap gap-2">
-    {
-      temas.map((tema) => (
-        <a
-          href={enlaceCategoria(tema.category)}
-          class="rounded-full border px-3 py-1 text-xs font-semibold transition hover:brightness-110"
-          style={`border-color:${colorCategoria(tema.category)};color:${colorCategoria(tema.category)}`}
-        >
-          {nombreTema(tema.category)}
-          <span class="ml-1 text-[var(--color-tinta-tenue)]">{numero(tema.articles)}</span>
-        </a>
-      ))
-    }
-  </nav>
+    Antes ponía "SECTION" encima del nombre --que es decir dos veces lo mismo--
+    dentro de una banda con degradado, y debajo una fila de pastillas huecas.
+    Un periódico hace otra cosa: el nombre grande, un filete del color de la
+    sección, el dato al lado en pequeño y los temas como enlaces con su regla.
+  -->
+  <header class="portadilla mb-6" style={`--acento:${acento}`}>
+    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+      <h1 class="font-display text-[2.6rem] font-black leading-none tracking-[-0.03em]">
+        {nombre}
+      </h1>
+      <p class="text-sm text-[var(--color-tinta-tenue)]">
+        <span class="font-semibold text-[var(--color-tinta-suave)]">
+          {numero(resultado.total)}
+        </span> stories
+        <span class="mx-1.5 opacity-40">/</span>
+        <span class="font-semibold text-[var(--color-tinta-suave)]">{temas.length}</span> topics
+      </p>
+    </div>
+
+    <nav aria-label={`${nombre} topics`} class="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+      {
+        temas.map((tema) => (
+          <a
+            href={enlaceCategoria(tema.category)}
+            class="enlace-portadilla"
+            style={`--acento:${colorCategoria(tema.category)}`}
+          >
+            {nombreTema(tema.category)}
+            <span class="ml-1 text-[0.7rem] opacity-55">{numero(tema.articles)}</span>
+          </a>
+        ))
+      }
+    </nav>
+  </header>
 
   {
     resultado.articulos.length === 0 ? (

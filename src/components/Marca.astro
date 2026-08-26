@@ -1,0 +1,40 @@
+---
+import Logo from "./Logo.astro";
+
+interface Props {
+  /** `cabecera` es la versión grande; `pie`, la del cierre de página. */
+  tamano?: "cabecera" | "pie";
+}
+const { tamano = "cabecera" } = Astro.props;
+const grande = tamano === "cabecera";
+// El pie va sobre fondo oscuro pase lo que pase con el tema, así que el
+// ".net" necesita su propio tono: el índigo de la marca no se lee ahí.
+const acento = grande ? "var(--color-marca)" : "var(--color-cierre-marca)";
+---
+
+<!--
+  El logotipo completo: sello y nombre.
+
+  Las marcas de prensa que funcionan son casi siempre un nombre bien dibujado
+  --The Guardian, el New York Times, la BBC-- con la imagen en segundo plano o
+  directamente ausente. Aquí manda el nombre: "Gigantum" pesado y muy junto, y
+  el ".net" pequeño y en color, que es lo que lo convierte en una marca en vez
+  de en un dominio escrito.
+
+  Vive en su propio componente porque la cabecera y el pie lo enseñaban cada
+  uno por su cuenta y se habían ido separando.
+-->
+<span class="flex shrink-0 items-center gap-2.5">
+  <Logo clase={grande ? "h-8 w-8" : "h-7 w-7"} />
+  <span
+    class:list={[
+      "font-display font-black leading-none tracking-[-0.035em]",
+      grande ? "text-[1.6rem]" : "text-xl",
+    ]}
+  >
+    Gigantum<span
+      class:list={["font-bold tracking-normal", grande ? "text-[0.95rem]" : "text-[0.8rem]"]}
+      style={`color:${acento}`}>.net</span
+    >
+  </span>
+</span>
