@@ -15,8 +15,8 @@ export interface Noticia {
   title: string;
   standfirst: string;
   summary: string;
+  /** Texto completo. Los párrafos van separados por un salto doble. */
   body: string;
-  paragraphs: string[];
   word_count: number;
   authors: string[];
   tags: string[];

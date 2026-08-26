@@ -1,26 +1,51 @@
 ---
 interface Props {
   clase?: string;
+  /**
+   * Sufijo del id del degradado. Dos SVG en la misma página no pueden
+   * compartir id, y el logo sale en la cabecera y en el pie.
+   */
+  id?: string;
 }
-const { clase = "h-7 w-auto" } = Astro.props;
+const { clase = "h-8 w-auto", id = "marca" } = Astro.props;
+const degradado = `grad-${id}`;
 ---
 
 <!--
-  Un ancla: el sitio como el sitio donde amarras y encuentras todo, en vez de ir
-  saltando de un medio a otro. Trazos gruesos y pocas formas, para que se siga
-  leyendo a 16 px en la pestaña del navegador.
+  Un ancla: el sitio donde amarras y encuentras todo, en vez de ir saltando de
+  un medio a otro.
+
+  Trazo grueso y pocas formas, porque a 28 px en la cabecera --y a 16 en la
+  pestaña-- lo fino se emborrona. Las puntas de uña son lo que hace que se lea
+  como un ancla y no como una letra, así que se quedan aunque cuesten dos
+  trazos más.
 -->
-<svg class={clase} viewBox="0 0 40 40" role="img" aria-label="Gigantum.net" fill="none">
-  <rect width="40" height="40" rx="9" fill="var(--color-marca)"></rect>
+<svg class={clase} viewBox="0 0 48 48" role="img" aria-label="Gigantum.net" fill="none">
+  <defs>
+    <linearGradient id={degradado} x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"></stop>
+      <stop offset="55%" stop-color="#7c3aed"></stop>
+      <stop offset="100%" stop-color="#a855f7"></stop>
+    </linearGradient>
+  </defs>
+
+  <rect width="48" height="48" rx="11" fill={`url(#${degradado})`}></rect>
+
   <g
     stroke="#fff"
-    stroke-width="2.6"
+    stroke-width="3.6"
     stroke-linecap="round"
     stroke-linejoin="round"
   >
-    <circle cx="20" cy="9.6" r="3"></circle>
-    <path d="M20 12.9V32.4"></path>
-    <path d="M13 17.4h14"></path>
-    <path d="M9.4 23.6c0 5.3 4.7 8.8 10.6 8.8s10.6-3.5 10.6-8.8"></path>
+    <!-- arganeo -->
+    <circle cx="24" cy="11.6" r="3.9"></circle>
+    <!-- caña -->
+    <path d="M24 15.5V38.6"></path>
+    <!-- cepo -->
+    <path d="M15.4 20.3h17.2"></path>
+    <!-- brazos -->
+    <path d="M10.8 27.6c0 7.1 5.5 11 13.2 11s13.2-3.9 13.2-11"></path>
+    <!-- uñas -->
+    <path d="M10.8 27.6 6.9 25.5M37.2 27.6l3.9-2.1"></path>
   </g>
 </svg>

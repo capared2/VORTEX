@@ -9,6 +9,7 @@ import { SITIO } from "../../lib/sitio";
 import { TTL } from "../../lib/cache";
 import {
   VERTICALES,
+  colorCategoria,
   colorVertical,
   enlaceCategoria,
   enlaceVertical,
@@ -65,7 +66,8 @@ const acento = colorVertical(vertical);
       temas.map((tema) => (
         <a
           href={enlaceCategoria(tema.category)}
-          class="rounded-full border border-[var(--color-linea)] px-3 py-1 text-xs font-medium text-[var(--color-tinta-suave)] transition hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
+          class="rounded-full border px-3 py-1 text-xs font-semibold transition hover:brightness-110"
+          style={`border-color:${colorCategoria(tema.category)};color:${colorCategoria(tema.category)}`}
         >
           {nombreTema(tema.category)}
           <span class="ml-1 text-[var(--color-tinta-tenue)]">{numero(tema.articles)}</span>

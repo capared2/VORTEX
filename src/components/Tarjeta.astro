@@ -25,7 +25,6 @@ const imagen = rutaImagen(
 );
 const entradilla = articulo.standfirst || articulo.summary;
 const enlace = enlaceNoticia(articulo.category, articulo.id);
-const acento = colorCategoria(articulo.category);
 // El nombre lo pone el sitio a partir de la clave, no el dataset: así un
 // registro guardado antes de un cambio de nombres no se cuela con el viejo.
 const tema = nombreTema(articulo.category);
@@ -33,11 +32,12 @@ const tema = nombreTema(articulo.category);
 // Cuántos medios cuentan esta misma historia. Se dice el número, nunca quiénes.
 const coberturas = "coverage" in articulo ? articulo.coverage : 1;
 const carga = prioritaria ? "eager" : "lazy";
+const acento = colorCategoria(articulo.category);
 ---
 
 {
   variante === "titular" ? (
-    <article class="barra-nicho py-2.5 pl-3.5" style={`--acento:${acento}`}>
+    <article class="filo-lado py-2.5 pl-3.5" style={`--acento:${acento}`}>
       <a
         href={enlaceCategoria(articulo.category)}
         class="text-[0.62rem] font-bold uppercase tracking-wider hover:underline"
@@ -59,14 +59,14 @@ const carga = prioritaria ? "eager" : "lazy";
     </article>
   ) : variante === "compacta" ? (
     <article class="group flex gap-3 border-b border-[var(--color-linea)] pb-3 last:border-0">
-      <a
-        href={enlace}
-        class="shrink-0 overflow-hidden rounded-lg bg-[var(--color-lienzo-alt)]"
-        data-foto
-        tabindex="-1"
-        aria-hidden="true"
-      >
-        {imagen ? (
+      {imagen && (
+        <a
+          href={enlace}
+          class="shrink-0 overflow-hidden rounded-lg bg-[var(--color-lienzo-alt)]"
+          data-foto
+          tabindex="-1"
+          aria-hidden="true"
+        >
           <img
             src={imagen}
             alt=""
@@ -76,10 +76,8 @@ const carga = prioritaria ? "eager" : "lazy";
             height="80"
             class="size-20 object-cover transition duration-300 group-hover:scale-105"
           />
-        ) : (
-          <div class="size-20" />
-        )}
-      </a>
+        </a>
+      )}
       <div class="min-w-0">
         <a
           href={enlaceCategoria(articulo.category)}
@@ -104,21 +102,22 @@ const carga = prioritaria ? "eager" : "lazy";
   ) : (
     <article
       class:list={[
-        "group flex flex-col overflow-hidden rounded-xl border border-[var(--color-linea)] bg-[var(--color-lienzo)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg",
+        "filo group flex flex-col overflow-hidden rounded-xl border border-[var(--color-linea)] bg-[var(--color-lienzo)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg",
         variante === "apertura" && "md:flex-row",
       ]}
+      style={`--acento:${acento}`}
     >
-      <a
-        href={enlace}
-        class:list={[
-          "block shrink-0 overflow-hidden bg-[var(--color-lienzo-alt)]",
-          variante === "apertura" && "md:w-1/2",
-        ]}
-        data-foto
-        tabindex="-1"
-        aria-hidden="true"
-      >
-        {imagen ? (
+      {imagen && (
+        <a
+          href={enlace}
+          class:list={[
+            "block shrink-0 overflow-hidden bg-[var(--color-lienzo-alt)]",
+            variante === "apertura" && "md:w-1/2",
+          ]}
+          data-foto
+          tabindex="-1"
+          aria-hidden="true"
+        >
           <img
             src={imagen}
             alt=""
@@ -130,10 +129,8 @@ const carga = prioritaria ? "eager" : "lazy";
               variante === "apertura" ? "aspect-[16/10] md:h-full" : "aspect-[16/9]",
             ]}
           />
-        ) : (
-          <div class:list={[variante === "apertura" ? "aspect-[16/10]" : "aspect-[16/9]"]} />
-        )}
-      </a>
+        </a>
+      )}
 
       <div class="flex flex-1 flex-col p-4">
         <div class="flex items-center gap-2">

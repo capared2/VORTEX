@@ -159,22 +159,21 @@ export function enlaceCategoria(clave: string, pagina = 1): string {
 // ---------------------------------------------------------------------------
 
 /**
- * Un acento por nicho. Es lo que hace que un río en el que se mezcla todo
- * siga siendo legible: el color dice de qué va la noticia antes de leerla.
+ * El color de un tema, como variable CSS.
+ *
+ * Devuelve `var()` encadenados en vez de un hexadecimal porque el tema oscuro
+ * tiene que poder aclararlos: con un color fijo desde aquí, lo que se ve bien
+ * sobre blanco se apaga sobre negro. La cadena además degrada sola --tema,
+ * nicho, marca--, así que un tema nuevo sale con el color de su nicho hasta
+ * que alguien le dé el suyo.
  */
-const COLORES: Record<string, string> = {
-  noticias: "#2f6df6",
-  deportes: "#12a150",
-  gamer: "#8b5cf6",
-  tecnologia: "#0e9bb8",
-};
-
-export function colorVertical(vertical: string): string {
-  return COLORES[vertical] ?? "var(--color-marca)";
+export function colorCategoria(clave: string): string {
+  const [vertical, tema] = clave.split("/");
+  return `var(--c-${tema ?? vertical}, var(--v-${vertical}, var(--color-marca)))`;
 }
 
-export function colorCategoria(clave: string): string {
-  return colorVertical(clave.split("/")[0]!);
+export function colorVertical(vertical: string): string {
+  return `var(--v-${vertical}, var(--color-marca))`;
 }
 
 /** Recorta un texto sin partir una palabra por la mitad. */

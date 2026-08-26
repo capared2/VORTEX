@@ -20,12 +20,53 @@
   --color-lienzo-alt: #eceff5;
   --color-linea: #e0e4ec;
 
-  /* Un acento por nicho. Es lo que mantiene legible un río en el que se
-     mezcla todo: el color dice de qué va la noticia antes de leerla. */
-  --color-noticias: #2f6df6;
-  --color-deportes: #12a150;
-  --color-gamer: #8b5cf6;
-  --color-tecnologia: #0e9bb8;
+  /* ---- Color por tema -------------------------------------------------
+     Un río en el que se mezcla todo necesita que el color diga de qué va
+     cada pieza antes de leerla. Cada nicho tiene su familia y cada tema su
+     tono dentro de ella, así que se distinguen entre sí sin dejar de
+     parecer del mismo sitio.
+
+     Van en CSS y no en JavaScript a propósito: así el tema oscuro puede
+     aclararlos, que es lo que antes no ocurría --los colores venían en
+     hexadecimal desde el código y se quedaban igual de oscuros sobre
+     fondo negro--. */
+
+  --v-news: #2f6df6;
+  --v-sports: #12a150;
+  --v-gaming: #8b5cf6;
+  --v-tech: #0e9bb8;
+
+  --c-world: #2f6df6;
+  --c-politics: #d6455d;
+  --c-business: #0f9488;
+  --c-society: #7c5cd6;
+  --c-health: #0891b2;
+  --c-culture: #d4438f;
+
+  --c-soccer: #12a150;
+  --c-basketball: #e8730c;
+  --c-nfl: #b45309;
+  --c-baseball: #0f766e;
+  --c-tennis: #65a30d;
+  --c-motorsport: #dc2626;
+  --c-golf: #059669;
+  --c-cycling: #ca8a04;
+  --c-combat: #b91c1c;
+  --c-cricket: #15803d;
+  --c-rugby: #4d7c0f;
+  --c-olympics: #0284c7;
+  --c-more: #64748b;
+
+  --c-games: #8b5cf6;
+  --c-esports: #d946ef;
+  --c-streaming: #a855f7;
+
+  --c-ai: #06b6d4;
+  --c-gadgets: #0ea5e9;
+  --c-companies: #14b8a6;
+  --c-science: #6366f1;
+  --c-software: #0891b2;
+  --c-crypto: #f59e0b;
 }
 
 @layer base {
@@ -48,10 +89,44 @@
     --color-lienzo-alt: #1a1e26;
     --color-linea: #262c37;
 
-    --color-noticias: #6f9bff;
-    --color-deportes: #3ecf7f;
-    --color-gamer: #b18cff;
-    --color-tecnologia: #3fc4de;
+    /* Los mismos tonos, aclarados: sobre fondo negro los originales se
+       apagan y dejan de leerse. */
+    --v-news: #6f9bff;
+    --v-sports: #3ecf7f;
+    --v-gaming: #b18cff;
+    --v-tech: #3fc4de;
+
+    --c-world: #6f9bff;
+    --c-politics: #ff7b8e;
+    --c-business: #35c9bb;
+    --c-society: #a892ff;
+    --c-health: #3fc4de;
+    --c-culture: #ff7ac0;
+
+    --c-soccer: #3ecf7f;
+    --c-basketball: #ffa14d;
+    --c-nfl: #e0a54d;
+    --c-baseball: #45c2b1;
+    --c-tennis: #a3d94a;
+    --c-motorsport: #ff6b6b;
+    --c-golf: #35c98e;
+    --c-cycling: #e8c04a;
+    --c-combat: #ff7a7a;
+    --c-cricket: #4ec97a;
+    --c-rugby: #a8d05a;
+    --c-olympics: #4fb3ee;
+    --c-more: #98a5b8;
+
+    --c-games: #b18cff;
+    --c-esports: #f07af0;
+    --c-streaming: #c39cff;
+
+    --c-ai: #3fd3ea;
+    --c-gadgets: #4fb8f5;
+    --c-companies: #45d3c2;
+    --c-science: #8b8cff;
+    --c-software: #3fc4de;
+    --c-crypto: #ffc04a;
   }
 
   body {
@@ -113,23 +188,28 @@
     line-height: 0.82;
     padding-right: 0.08em;
     font-weight: 800;
-    color: var(--color-marca);
+    color: var(--acento, var(--color-marca));
   }
 }
 
-/* Franja de color del nicho, sin tener que pintar cada variante a mano. */
-@utility barra-nicho {
-  position: relative;
+/* Enlace que al pasar por encima toma el color de su tema. Con `--acento`
+   fijado en el propio elemento, sin una línea de JavaScript por enlace. */
+@utility enlace-tema {
+  transition: color 0.15s ease;
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: 3px;
-    border-radius: 3px;
-    background: var(--acento, var(--color-marca));
+  &:hover {
+    color: var(--acento, var(--color-marca));
   }
+}
+
+/* Franja del color del tema. Se pinta con --acento, que cada componente fija
+   a la variable del tema que le toque. */
+@utility filo {
+  border-top: 3px solid var(--acento, var(--color-marca));
+}
+
+@utility filo-lado {
+  border-left: 3px solid var(--acento, var(--color-marca));
 }
 
 @media (prefers-reduced-motion: reduce) {

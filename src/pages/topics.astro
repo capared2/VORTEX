@@ -5,6 +5,7 @@ import { grafoTemas } from "../lib/seo";
 import { SITIO } from "../lib/sitio";
 import { TTL } from "../lib/cache";
 import {
+  colorCategoria,
   colorVertical,
   enlaceCategoria,
   enlaceVertical,
@@ -46,7 +47,7 @@ const verticales = indice?.verticals ?? [];
             <h2 class="mb-3 border-b-2 pb-1.5" style={`border-color:${acento}`}>
               <a
                 href={enlaceVertical(vertical.vertical)}
-                class="font-display text-xl font-extrabold tracking-tight hover:opacity-80"
+                class="font-display text-xl font-extrabold tracking-tight hover:brightness-110"
                 style={`color:${acento}`}
               >
                 {nombreVertical(vertical.vertical)}
@@ -60,9 +61,15 @@ const verticales = indice?.verticals ?? [];
                 <li>
                   <a
                     href={enlaceCategoria(tema.category)}
-                    class="flex items-baseline justify-between gap-3 rounded-lg border border-[var(--color-linea)] bg-[var(--color-lienzo)] px-3.5 py-2.5 transition hover:border-[var(--color-marca)]"
+                    class="filo-lado flex items-baseline justify-between gap-3 rounded-lg border border-[var(--color-linea)] bg-[var(--color-lienzo)] px-3.5 py-2.5 transition hover:-translate-y-0.5 hover:shadow-sm"
+                    style={`--acento:${colorCategoria(tema.category)}`}
                   >
-                    <span class="font-medium">{nombreTema(tema.category)}</span>
+                    <span
+                      class="font-semibold"
+                      style={`color:${colorCategoria(tema.category)}`}
+                    >
+                      {nombreTema(tema.category)}
+                    </span>
                     <span class="shrink-0 text-xs text-[var(--color-tinta-tenue)]">
                       {numero(tema.articles)}
                     </span>

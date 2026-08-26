@@ -40,10 +40,12 @@ const acento = colorCategoria(noticia.category);
 const imagen = rutaImagen(noticia.images?.[0]?.url);
 const pie = noticia.images?.[0]?.caption;
 
-const parrafos = MOSTRAR_CUERPO_COMPLETO
-  ? noticia.paragraphs
-  : noticia.paragraphs.slice(0, PARRAFOS_DE_MUESTRA);
-const recortada = parrafos.length < noticia.paragraphs.length;
+// El dataset guarda el cuerpo entero y no los párrafos por separado: era el
+// mismo texto dos veces y doblaba el peso del fichero que hay que parsear para
+// pintar esta página. Partirlo aquí es gratis al lado de eso.
+const todos = noticia.body ? noticia.body.split("\n\n") : [];
+const parrafos = MOSTRAR_CUERPO_COMPLETO ? todos : todos.slice(0, PARRAFOS_DE_MUESTRA);
+const recortada = parrafos.length < todos.length;
 
 const entradilla = noticia.standfirst || noticia.summary;
 const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.body, 180);
@@ -143,7 +145,7 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
         )
       }
 
-      <div class="prosa mt-6 max-w-[68ch]">
+      <div class="prosa mt-6 max-w-[68ch]" style={`--acento:${acento}`}>
         {parrafos.map((parrafo) => <p>{parrafo}</p>)}
       </div>
 
@@ -187,7 +189,10 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
       {
         versiones.length > 0 && (
           <section id="versiones">
-            <h2 class="mb-1 font-display text-xs font-bold uppercase tracking-wider" style={`color:${acento}`}>
+            <h2
+              class="mb-1 font-display text-xs font-bold uppercase tracking-wider"
+              style={`color:${acento}`}
+            >
               Other takes on this story
             </h2>
             <p class="mb-3 text-xs leading-relaxed text-[var(--color-tinta-tenue)]">

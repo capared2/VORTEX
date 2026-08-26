@@ -2,7 +2,15 @@
 import type { Indice } from "../lib/types";
 import Logo from "./Logo.astro";
 import { SITIO } from "../lib/sitio";
-import { enlaceCategoria, enlaceVertical, nombreTema, nombreVertical, numero } from "../lib/formato";
+import {
+  colorCategoria,
+  colorVertical,
+  enlaceCategoria,
+  enlaceVertical,
+  nombreTema,
+  nombreVertical,
+  numero,
+} from "../lib/formato";
 
 interface Props {
   indice: Indice | null;
@@ -17,7 +25,7 @@ const año = new Date().getFullYear();
   <div class="contenedor grid gap-8 py-10 md:grid-cols-[1.4fr_2fr]">
     <div>
       <div class="flex items-center gap-2.5">
-        <Logo />
+        <Logo id="pie" />
         <span class="font-display text-lg font-extrabold tracking-tight">{SITIO.nombre}</span>
       </div>
       <p class="mt-3 max-w-sm text-sm leading-relaxed text-[var(--color-tinta-suave)]">
@@ -36,8 +44,12 @@ const año = new Date().getFullYear();
       {
         verticales.map((vertical) => (
           <div>
-            <h2 class="font-display text-xs font-bold uppercase tracking-wider text-[var(--color-tinta)]">
-              <a href={enlaceVertical(vertical.vertical)} class="hover:text-[var(--color-marca)]">
+            <h2 class="font-display text-xs font-bold uppercase tracking-wider">
+              <a
+                href={enlaceVertical(vertical.vertical)}
+                class="hover:brightness-110"
+                style={`color:${colorVertical(vertical.vertical)}`}
+              >
                 {nombreVertical(vertical.vertical)}
               </a>
             </h2>
@@ -49,7 +61,8 @@ const año = new Date().getFullYear();
                   <li>
                     <a
                       href={enlaceCategoria(c.category)}
-                      class="text-sm text-[var(--color-tinta-suave)] hover:text-[var(--color-marca)]"
+                      class="enlace-tema text-sm text-[var(--color-tinta-suave)]"
+                      style={`--acento:${colorCategoria(c.category)}`}
                     >
                       {nombreTema(c.category)}
                     </a>
