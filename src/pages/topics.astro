@@ -18,19 +18,19 @@ const verticales = indice?.verticals ?? [];
 ---
 
 <Base
-  titulo={`Todos los temas · ${SITIO.nombre}`}
-  descripcion={`Los ${indice?.total_categories ?? 0} temas en los que se organiza ${SITIO.nombre}, repartidos entre sus nichos.`}
-  canonical="/temas"
+  titulo={`All topics · ${SITIO.nombre}`}
+  descripcion={`The ${indice?.total_categories ?? 0} topics ${SITIO.nombre} is organised into, across every section.`}
+  canonical="/topics"
   indice={indice}
   cache={TTL.paginaListado}
   jsonLd={grafoTemas(indice)}
 >
   <header class="mb-7 border-b border-[var(--color-linea)] pb-3">
-    <h1 class="font-display text-3xl font-extrabold tracking-tight">Todos los temas</h1>
+    <h1 class="font-display text-3xl font-extrabold tracking-tight">All topics</h1>
     {
       indice && (
         <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
-          {numero(indice.total_articles)} noticias repartidas en {numero(indice.total_categories)} temas
+          {numero(indice.total_articles)} stories across {numero(indice.total_categories)} topics
         </p>
       )
     }
@@ -52,7 +52,7 @@ const verticales = indice?.verticals ?? [];
                 {nombreVertical(vertical.vertical)}
               </a>
               <span class="ml-2 text-xs font-normal text-[var(--color-tinta-tenue)]">
-                {numero(vertical.articles)} noticias
+                {numero(vertical.articles)} stories
               </span>
             </h2>
             <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">

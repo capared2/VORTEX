@@ -59,31 +59,45 @@ function decodificar(testigo: string): string | null {
   }
 }
 
-const vacia = (estado: number) =>
+/**
+ * Respuesta vacía para una imagen que no se puede servir.
+ *
+ * El código importa: sin distinguirlos, un host fuera de la lista, una foto
+ * que ya no existe y un rechazo del origen se ven exactamente igual desde
+ * fuera, y no hay forma de saber si lo que falla es la configuración o la
+ * red. El motivo va además en una cabecera propia.
+ */
+const vacia = (estado: number, motivo: string) =>
   new Response(null, {
     status: estado,
-    // Una imagen que falla lo va a seguir haciendo: cachear el fallo evita
-    // repetir la subpetición en cada visita.
-    headers: { "Cache-Control": "public, max-age=300, s-maxage=3600" },
+    headers: {
+      // Una imagen que falla lo va a seguir haciendo: cachear el fallo evita
+      // repetir la subpetición en cada visita.
+      "Cache-Control": "public, max-age=300, s-maxage=3600",
+      "X-Img": motivo,
+    },
   });
 
 export const GET: APIRoute = async ({ params, request }) => {
   const testigo = params.testigo;
-  if (!testigo) return vacia(404);
+  if (!testigo) return vacia(404, "sin-testigo");
 
   const crudo = decodificar(testigo);
-  if (!crudo) return vacia(404);
+  if (!crudo) return vacia(400, "testigo-ilegible");
 
   let destino: URL;
   try {
     destino = new URL(crudo);
   } catch {
-    return vacia(404);
+    return vacia(400, "url-invalida");
   }
-  if (destino.protocol !== "https:" && destino.protocol !== "http:") return vacia(404);
+  if (destino.protocol !== "https:" && destino.protocol !== "http:") {
+    return vacia(400, "protocolo-no-permitido");
+  }
 
   const hosts = await hostsPermitidos();
-  if (!hosts.includes(destino.hostname.toLowerCase())) return vacia(404);
+  if (!hosts.length) return vacia(503, "lista-de-hosts-no-disponible");
+  if (!hosts.includes(destino.hostname.toLowerCase())) return vacia(403, "host-no-permitido");
 
   try {
     const origen = await fetch(destino.toString(), {
@@ -99,13 +113,17 @@ export const GET: APIRoute = async ({ params, request }) => {
       cf: { cacheTtl: TTL.imagen, cacheEverything: true },
     } as RequestInit);
 
-    if (!origen.ok || !origen.body) return vacia(404);
+    // La foto ya no existe es un caso distinto de que el origen nos rechace:
+    // lo primero es normal en un archivo viejo, lo segundo hay que mirarlo.
+    if (origen.status === 404 || origen.status === 410) return vacia(404, "no-existe-en-origen");
+    if (!origen.ok) return vacia(502, `origen-${origen.status}`);
+    if (!origen.body) return vacia(502, "origen-sin-cuerpo");
 
     const tipo = origen.headers.get("Content-Type") ?? "";
-    if (!tipo.startsWith("image/")) return vacia(415);
+    if (!tipo.startsWith("image/")) return vacia(415, "no-es-una-imagen");
 
     const largo = Number(origen.headers.get("Content-Length") ?? 0);
-    if (largo > TAMANO_MAXIMO) return vacia(413);
+    if (largo > TAMANO_MAXIMO) return vacia(413, "demasiado-grande");
 
     const cabeceras = new Headers({
       "Content-Type": tipo,
@@ -119,7 +137,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     // y memoria del isolate para nada.
     return new Response(request.method === "HEAD" ? null : origen.body, { headers: cabeceras });
   } catch {
-    return vacia(502);
+    return vacia(504, "el-origen-no-responde");
   }
 };
 

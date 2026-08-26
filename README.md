@@ -13,18 +13,24 @@ entran noticias nuevas aparecen solas, sin reconstruir ni desplegar nada.
 
 ```
 /                                   el río: todo mezclado y agrupado por historia
-/temas                              directorio de temas
-/{nicho}                            noticias, deportes, gamer, tecnologia
-/{nicho}/{tema}                     deportes/futbol, tecnologia/ia…
-/noticia/{nicho}/{tema}/{id}        una noticia
-/buscar?q=                          búsqueda sobre lo reciente
+/topics                             directorio de temas
+/{seccion}                          news, sports, gaming, tech
+/{seccion}/{tema}                   sports/soccer, tech/ai…
+/article/{seccion}/{tema}/{id}      una noticia
+/search?q=                          búsqueda sobre lo reciente
 /img/{testigo}                      las fotos, servidas por este dominio
 /rss.xml  /sitemap.xml  /robots.txt  /llms.txt
 ```
 
-Las cuatro verticales cuelgan de la raíz a propósito: `gigantum.net/deportes`
-posiciona mejor que un prefijo intermedio, y las rutas estáticas (`/temas`,
-`/buscar`, los sitemaps) tienen prioridad sobre la dinámica, así que no chocan.
+**El sitio está íntegramente en inglés**, porque la inmensa mayoría de lo que
+recogen las fuentes lo está. Eso incluye las claves de la taxonomía y por tanto
+las rutas: una web en inglés con URLs en español reparte mal la autoridad. Los
+comentarios del código y este documento se quedan en español, que son para quien
+lo mantiene y no para quien lo lee.
+
+Las cuatro secciones cuelgan de la raíz a propósito: `gigantum.net/sports`
+posiciona mejor que un prefijo intermedio, y las rutas estáticas (`/topics`,
+`/search`, los sitemaps) tienen prioridad sobre la dinámica, así que no chocan.
 
 ## Tres decisiones que explican el resto del código
 

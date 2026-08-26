@@ -5,12 +5,22 @@ interface Props {
 const { clase = "h-7 w-auto" } = Astro.props;
 ---
 
-<svg class={clase} viewBox="0 0 40 40" role="img" aria-label="Gigantum" fill="none">
+<!--
+  Un ancla: el sitio como el sitio donde amarras y encuentras todo, en vez de ir
+  saltando de un medio a otro. Trazos gruesos y pocas formas, para que se siga
+  leyendo a 16 px en la pestaña del navegador.
+-->
+<svg class={clase} viewBox="0 0 40 40" role="img" aria-label="Gigantum.net" fill="none">
   <rect width="40" height="40" rx="9" fill="var(--color-marca)"></rect>
-  <!-- Cuatro trazos que convergen: los cuatro nichos en un solo río. -->
-  <path
-    d="M9 11h22M13 20h18M17 29h14"
+  <g
     stroke="#fff"
-    stroke-width="3.4"
-    stroke-linecap="round"></path>
+    stroke-width="2.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <circle cx="20" cy="9.6" r="3"></circle>
+    <path d="M20 12.9V32.4"></path>
+    <path d="M13 17.4h14"></path>
+    <path d="M9.4 23.6c0 5.3 4.7 8.8 10.6 8.8s10.6-3.5 10.6-8.8"></path>
+  </g>
 </svg>

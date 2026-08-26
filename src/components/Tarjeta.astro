@@ -26,9 +26,9 @@ const imagen = rutaImagen(
 const entradilla = articulo.standfirst || articulo.summary;
 const enlace = enlaceNoticia(articulo.category, articulo.id);
 const acento = colorCategoria(articulo.category);
-const tema = "topic_name" in articulo && articulo.topic_name
-  ? articulo.topic_name
-  : nombreTema(articulo.category);
+// El nombre lo pone el sitio a partir de la clave, no el dataset: así un
+// registro guardado antes de un cambio de nombres no se cuela con el viejo.
+const tema = nombreTema(articulo.category);
 
 // Cuántos medios cuentan esta misma historia. Se dice el número, nunca quiénes.
 const coberturas = "coverage" in articulo ? articulo.coverage : 1;
@@ -54,7 +54,7 @@ const carga = prioritaria ? "eager" : "lazy";
         {articulo.published_at && (
           <time datetime={articulo.published_at}>{haceCuanto(articulo.published_at)}</time>
         )}
-        {coberturas > 1 && <span>· {coberturas} coberturas</span>}
+        {coberturas > 1 && <span>· {coberturas} takes</span>}
       </div>
     </article>
   ) : variante === "compacta" ? (
@@ -97,7 +97,7 @@ const carga = prioritaria ? "eager" : "lazy";
           {articulo.published_at && (
             <time datetime={articulo.published_at}>{haceCuanto(articulo.published_at)}</time>
           )}
-          {coberturas > 1 && <span>· {coberturas} coberturas</span>}
+          {coberturas > 1 && <span>· {coberturas} takes</span>}
         </div>
       </div>
     </article>
@@ -148,9 +148,9 @@ const carga = prioritaria ? "eager" : "lazy";
             <span
               class="rounded-full px-1.5 py-px text-[0.6rem] font-bold uppercase tracking-wide text-white"
               style={`background:${acento}`}
-              title="Cuántas versiones de esta misma historia hay recogidas"
+              title="How many separate takes on this same story are collected"
             >
-              {coberturas} coberturas
+              {coberturas} takes
             </span>
           )}
         </div>

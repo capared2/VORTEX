@@ -29,7 +29,7 @@ function cacheable(url: URL): boolean {
   // La búsqueda admite infinitas consultas distintas: llenaría la caché de
   // entradas de un solo uso. Sale barata igualmente, porque solo lee un fichero
   // que ya está memorizado.
-  if (url.pathname.startsWith("/buscar")) return false;
+  if (url.pathname.startsWith("/search")) return false;
 
   // Las imágenes ya se sirven con su propia cabecera de caché inmutable y las
   // guarda el edge por su cuenta; meterlas también aquí duplicaría el

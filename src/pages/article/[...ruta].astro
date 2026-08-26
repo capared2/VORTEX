@@ -17,7 +17,7 @@ import {
   rutaImagen,
 } from "../../lib/formato";
 
-// La ruta es /noticia/<vertical>/<tema>/<id>: la categoría son todos los
+// La ruta es /article/<vertical>/<tema>/<id>: la categoría son todos los
 // segmentos menos el último.
 const partes = (Astro.params.ruta ?? "").split("/").filter(Boolean);
 if (partes.length < 3) {
@@ -52,7 +52,7 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
 <Base
   titulo={`${recortar(noticia.title, 65)} · ${SITIO.nombre}`}
   descripcion={descripcion}
-  canonical={`/noticia/${noticia.category}/${noticia.id}`}
+  canonical={`/article/${noticia.category}/${noticia.id}`}
   indice={indice}
   verticalActiva={vertical}
   idioma={noticia.language || SITIO.idioma}
@@ -67,8 +67,8 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
 >
   <div class="grid gap-9 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
     <article>
-      <nav aria-label="Migas de pan" class="mb-3 text-xs text-[var(--color-tinta-tenue)]">
-        <a href="/" class="hover:text-[var(--color-marca)]">Inicio</a>
+      <nav aria-label="Breadcrumb" class="mb-3 text-xs text-[var(--color-tinta-tenue)]">
+        <a href="/" class="hover:text-[var(--color-marca)]">Home</a>
         <span class="mx-1.5">›</span>
         <a href={enlaceVertical(vertical)} class="hover:text-[var(--color-marca)]">
           {nombreVertical(vertical)}
@@ -94,7 +94,7 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
 
         {
           entradilla && (
-            <p class="entradilla mt-3 font-serif text-lg leading-relaxed text-[var(--color-tinta-suave)]">
+            <p class="standfirst mt-3 font-serif text-lg leading-relaxed text-[var(--color-tinta-suave)]">
               {entradilla}
             </p>
           )
@@ -106,19 +106,19 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
               <time datetime={noticia.published_at}>{fecha(noticia.published_at, true)}</time>
             )
           }
-          {noticia.word_count > 0 && <span>· {numero(noticia.word_count)} palabras</span>}
+          {noticia.word_count > 0 && <span>· {numero(noticia.word_count)} words</span>}
           {
             versiones.length > 0 && (
               <span>
                 · <a href="#versiones" class="underline hover:text-[var(--color-marca)]">
-                  {versiones.length + 1} versiones de esta historia
+                  {versiones.length + 1} takes on this story
                 </a>
               </span>
             )
           }
           {
             noticia.modified_at && noticia.modified_at !== noticia.published_at && (
-              <span>· actualizada el {fecha(noticia.modified_at, true)}</span>
+              <span>· updated {fecha(noticia.modified_at, true)}</span>
             )
           }
         </div>
@@ -150,7 +150,7 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
       {
         recortada && (
           <p class="mt-4 max-w-[68ch] rounded-lg border border-[var(--color-linea)] bg-[var(--color-lienzo)] px-4 py-3 text-sm text-[var(--color-tinta-suave)]">
-            Se muestra solo un extracto de esta noticia.
+            Only an extract of this story is shown.
           </p>
         )
       }
@@ -159,13 +159,13 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
         noticia.tags.length > 0 && (
           <div class="mt-7 border-t border-[var(--color-linea)] pt-4">
             <h2 class="mb-2 font-display text-xs font-bold uppercase tracking-wider text-[var(--color-tinta-tenue)]">
-              Temas de esta noticia
+              Topics in this story
             </h2>
             <ul class="flex flex-wrap gap-2">
               {noticia.tags.slice(0, 12).map((etiqueta) => (
                 <li>
                   <a
-                    href={`/buscar?q=${encodeURIComponent(etiqueta)}`}
+                    href={`/search?q=${encodeURIComponent(etiqueta)}`}
                     class="inline-block rounded-full bg-[var(--color-lienzo-alt)] px-3 py-1 text-xs text-[var(--color-tinta-suave)] transition hover:text-[var(--color-marca)]"
                   >
                     {etiqueta}
@@ -178,8 +178,8 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
       }
 
       <p class="mt-6 text-xs leading-relaxed text-[var(--color-tinta-tenue)]">
-        Contenido recopilado de fuentes externas. Los derechos del texto pertenecen a
-        quien lo publicó originalmente.
+        Gathered from external sources. Rights to this text belong to whoever
+        originally published it.
       </p>
     </article>
 
@@ -188,10 +188,10 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
         versiones.length > 0 && (
           <section id="versiones">
             <h2 class="mb-1 font-display text-xs font-bold uppercase tracking-wider" style={`color:${acento}`}>
-              Otras versiones de esta historia
+              Other takes on this story
             </h2>
             <p class="mb-3 text-xs leading-relaxed text-[var(--color-tinta-tenue)]">
-              Lo mismo contado desde otro sitio, con su propio enfoque.
+              The same story told elsewhere, with its own angle.
             </p>
             <div class="space-y-3">
               {versiones.map((articulo) => (
@@ -206,7 +206,7 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
         relacionadas.length > 0 && (
           <section>
             <h2 class="mb-3 font-display text-xs font-bold uppercase tracking-wider text-[var(--color-tinta-tenue)]">
-              Relacionadas
+              Related
             </h2>
             <div class="space-y-3">
               {relacionadas.map((articulo) => (

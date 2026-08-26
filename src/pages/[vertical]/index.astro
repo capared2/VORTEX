@@ -43,7 +43,7 @@ const acento = colorVertical(vertical);
 
 <Base
   titulo={`${nombre} · ${SITIO.nombre}`}
-  descripcion={`Todo lo de ${nombre.toLowerCase()} reunido y ordenado por temas en ${SITIO.nombre}.`}
+  descripcion={`Everything on ${nombre.toLowerCase()}, gathered and sorted by topic on ${SITIO.nombre}.`}
   canonical={enlaceVertical(vertical, resultado.pagina)}
   indice={indice}
   verticalActiva={vertical}
@@ -53,14 +53,14 @@ const acento = colorVertical(vertical);
   siguiente={resultado.pagina < resultado.paginas ? enlaceVertical(vertical, resultado.pagina + 1) : null}
 >
   <header class="mb-5 border-b-2 pb-3" style={`border-color:${acento}`}>
-    <p class="text-xs font-bold uppercase tracking-wider" style={`color:${acento}`}>Nicho</p>
+    <p class="text-xs font-bold uppercase tracking-wider" style={`color:${acento}`}>Section</p>
     <h1 class="font-display text-3xl font-extrabold tracking-tight">{nombre}</h1>
     <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
-      {numero(resultado.total)} noticias en {temas.length} temas
+      {numero(resultado.total)} stories across {temas.length} topics
     </p>
   </header>
 
-  <nav aria-label={`Temas de ${nombre}`} class="mb-6 flex flex-wrap gap-2">
+  <nav aria-label={`${nombre} topics`} class="mb-6 flex flex-wrap gap-2">
     {
       temas.map((tema) => (
         <a
@@ -76,7 +76,7 @@ const acento = colorVertical(vertical);
 
   {
     resultado.articulos.length === 0 ? (
-      <Vacio titulo="Todavía no hay noticias en este nicho" />
+      <Vacio titulo="No stories in this section yet" />
     ) : (
       <>
         <Rejilla articulos={resultado.articulos} conApertura={resultado.pagina === 1} />

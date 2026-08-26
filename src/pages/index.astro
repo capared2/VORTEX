@@ -63,18 +63,18 @@ const nichos = (indice?.verticals ?? [])
   {
     historias.length === 0 ? (
       <Vacio
-        titulo="Todavía no hay nada que enseñar"
-        detalle="El archivo se está construyendo. Vuelve dentro de un rato."
+        titulo="Nothing to show just yet"
+        detalle="The archive is still filling up. Check back in a little while."
       />
     ) : (
       <>
         <div class="mb-6 flex items-baseline justify-between gap-4 border-b border-[var(--color-linea)] pb-3">
           <h1 class="font-display text-2xl font-extrabold tracking-tight">
-            Lo último, de todo
+            Latest, from everywhere
           </h1>
           {indice && (
             <p class="shrink-0 text-xs text-[var(--color-tinta-tenue)]">
-              {numero(indice.total_articles)} noticias · {numero(indice.total_categories)} temas
+              {numero(indice.total_articles)} stories · {numero(indice.total_categories)} topics
             </p>
           )}
         </div>
@@ -86,7 +86,7 @@ const nichos = (indice?.verticals ?? [])
 
           <aside class="lg:border-l lg:border-[var(--color-linea)] lg:pl-6">
             <h2 class="mb-3 font-display text-xs font-bold uppercase tracking-wider text-[var(--color-tinta-tenue)]">
-              Al minuto
+              As it happens
             </h2>
             <div class="space-y-1">
               {titulares.map((articulo) => (
@@ -99,7 +99,7 @@ const nichos = (indice?.verticals ?? [])
         {resto.length > 0 && (
           <section class="mt-10">
             <h2 class="mb-4 border-b border-[var(--color-linea)] pb-2 font-display text-lg font-extrabold tracking-tight">
-              Más historias
+              More stories
             </h2>
             <Rejilla articulos={resto} />
           </section>
@@ -108,7 +108,7 @@ const nichos = (indice?.verticals ?? [])
         {nichos.length > 0 && (
           <section class="mt-12">
             <h2 class="mb-4 border-b border-[var(--color-linea)] pb-2 font-display text-lg font-extrabold tracking-tight">
-              Por nicho
+              By section
             </h2>
             <div class="grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
               {nichos.map((nicho) => (

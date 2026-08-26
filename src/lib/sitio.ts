@@ -1,16 +1,16 @@
 /** Identidad del sitio, en un solo lugar. */
 export const SITIO = {
-  nombre: "Gigantum",
+  nombre: "Gigantum.net",
   dominio: "https://gigantum.net",
-  titulo: "Gigantum · Toda la actualidad en un solo sitio",
-  lema: "Un solo río de noticias",
+  titulo: "Gigantum.net · Everything that matters, in one place",
+  lema: "One river of news",
   descripcion:
-    "Agregador universal: noticias, deportes, videojuegos y tecnología reunidos y " +
-    "ordenados en un mismo lugar, agrupados por historia y actualizados cada pocas horas.",
-  idioma: "es",
-  locale: "es_ES",
-  pais: "ES",
-  zona: "Europe/Madrid",
+    "A universal aggregator: news, sports, gaming and technology gathered and " +
+    "sorted in one place, grouped by story and refreshed every couple of hours.",
+  idioma: "en",
+  locale: "en_US",
+  pais: "US",
+  zona: "America/New_York",
 } as const;
 
 /**

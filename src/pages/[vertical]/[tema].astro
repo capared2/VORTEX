@@ -46,7 +46,7 @@ const hermanos = (indice?.categories ?? [])
 
 <Base
   titulo={`${nombre} · ${SITIO.nombre}`}
-  descripcion={`Últimas noticias de ${nombre.toLowerCase()}, reunidas y ordenadas en ${SITIO.nombre}.`}
+  descripcion={`The latest ${nombre.toLowerCase()} news, gathered and sorted on ${SITIO.nombre}.`}
   canonical={enlaceCategoria(clave, resultado.pagina)}
   indice={indice}
   verticalActiva={vertical}
@@ -55,8 +55,8 @@ const hermanos = (indice?.categories ?? [])
   anterior={resultado.pagina > 1 ? enlaceCategoria(clave, resultado.pagina - 1) : null}
   siguiente={resultado.pagina < resultado.paginas ? enlaceCategoria(clave, resultado.pagina + 1) : null}
 >
-  <nav aria-label="Migas de pan" class="mb-3 text-xs text-[var(--color-tinta-tenue)]">
-    <a href="/" class="hover:text-[var(--color-marca)]">Inicio</a>
+  <nav aria-label="Breadcrumb" class="mb-3 text-xs text-[var(--color-tinta-tenue)]">
+    <a href="/" class="hover:text-[var(--color-marca)]">Home</a>
     <span class="mx-1.5">›</span>
     <a href={enlaceVertical(vertical)} class="hover:text-[var(--color-marca)]">
       {nombreVertical(vertical)}
@@ -66,13 +66,13 @@ const hermanos = (indice?.categories ?? [])
   <header class="mb-6 border-b-2 pb-3" style={`border-color:${acento}`}>
     <h1 class="font-display text-3xl font-extrabold tracking-tight">{nombre}</h1>
     <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
-      {numero(resultado.total)} noticias
+      {numero(resultado.total)} stories
     </p>
   </header>
 
   {
     resultado.articulos.length === 0 ? (
-      <Vacio titulo="Todavía no hay noticias en este tema" />
+      <Vacio titulo="No stories in this topic yet" />
     ) : (
       <>
         <Rejilla articulos={resultado.articulos} conApertura={resultado.pagina === 1} />
@@ -87,9 +87,9 @@ const hermanos = (indice?.categories ?? [])
 
   {
     hermanos.length > 0 && (
-      <nav aria-label={`Otros temas de ${nombreVertical(vertical)}`} class="mt-10 border-t border-[var(--color-linea)] pt-5">
+      <nav aria-label={`More ${nombreVertical(vertical)} topics`} class="mt-10 border-t border-[var(--color-linea)] pt-5">
         <h2 class="mb-3 font-display text-xs font-bold uppercase tracking-wider text-[var(--color-tinta-tenue)]">
-          Más de {nombreVertical(vertical)}
+          More from {nombreVertical(vertical)}
         </h2>
         <div class="flex flex-wrap gap-2">
           {hermanos.map((hermano) => (

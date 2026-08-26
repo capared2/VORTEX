@@ -45,23 +45,23 @@ const resultados = terminos.length
 ---
 
 <Base
-  titulo={consulta ? `"${consulta}" · Buscar en ${SITIO.nombre}` : `Buscar · ${SITIO.nombre}`}
-  descripcion={`Busca entre lo último publicado en ${SITIO.nombre}.`}
-  canonical="/buscar"
+  titulo={consulta ? `"${consulta}" · Search ${SITIO.nombre}` : `Search · ${SITIO.nombre}`}
+  descripcion={`Search the latest published on ${SITIO.nombre}.`}
+  canonical="/search"
   indice={indice}
   cache={TTL.paginaListado}
   noindex
 >
   <header class="mb-6">
-    <h1 class="font-display text-3xl font-extrabold tracking-tight">Buscar</h1>
-    <form action="/buscar" method="get" role="search" class="mt-4 flex gap-2">
-      <label for="consulta" class="sr-only">Qué buscar</label>
+    <h1 class="font-display text-3xl font-extrabold tracking-tight">Search</h1>
+    <form action="/search" method="get" role="search" class="mt-4 flex gap-2">
+      <label for="consulta" class="sr-only">What to search for</label>
       <input
         id="consulta"
         type="search"
         name="q"
         value={consulta}
-        placeholder="Escribe una palabra o un nombre"
+        placeholder="Type a word or a name"
         autofocus
         class="w-full rounded-lg border border-[var(--color-linea)] bg-[var(--color-lienzo)] px-4 py-2.5 outline-none transition focus:border-[var(--color-marca)]"
       />
@@ -69,25 +69,25 @@ const resultados = terminos.length
         type="submit"
         class="shrink-0 rounded-lg bg-[var(--color-marca)] px-5 py-2.5 font-semibold text-white transition hover:bg-[var(--color-marca-oscuro)]"
       >
-        Buscar
+        Search
       </button>
     </form>
     <p class="mt-2 text-xs text-[var(--color-tinta-tenue)]">
-      La búsqueda mira lo publicado más recientemente. Para el archivo completo, entra por
-      <a href="/temas" class="underline hover:text-[var(--color-marca)]">los temas</a>.
+      Search covers the most recently published. For the full archive, browse
+      <a href="/topics" class="underline hover:text-[var(--color-marca)]">the topics</a>.
     </p>
   </header>
 
   {
     !consulta ? null : resultados.length === 0 ? (
       <Vacio
-        titulo={`Nada para "${consulta}"`}
-        detalle="Prueba con otra palabra, o mira los temas para recorrer el archivo."
+        titulo={`Nothing for "${consulta}"`}
+        detalle="Try another word, or browse the topics to walk the archive."
       />
     ) : (
       <>
         <p class="mb-4 text-sm text-[var(--color-tinta-suave)]">
-          {resultados.length} {resultados.length === 1 ? "resultado" : "resultados"} para
+          {resultados.length} {resultados.length === 1 ? "result" : "results"} for
           <strong class="font-semibold">"{consulta}"</strong>
         </p>
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

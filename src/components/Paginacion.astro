@@ -17,14 +17,14 @@ const numeros = Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i);
 
 {
   paginas > 1 && (
-    <nav aria-label="Paginación" class="mt-8 flex flex-wrap items-center justify-center gap-1.5">
+    <nav aria-label="Pagination" class="mt-8 flex flex-wrap items-center justify-center gap-1.5">
       {pagina > 1 && (
         <a
           href={enlace(pagina - 1)}
           rel="prev"
           class="rounded-md border border-[var(--color-linea)] px-3 py-1.5 text-sm font-medium transition hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
         >
-          Anterior
+          Previous
         </a>
       )}
 
@@ -68,7 +68,7 @@ const numeros = Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i);
           rel="next"
           class="rounded-md border border-[var(--color-linea)] px-3 py-1.5 text-sm font-medium transition hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
         >
-          Siguiente
+          Next
         </a>
       )}
     </nav>

@@ -1,13 +1,13 @@
 import { SITIO } from "./sitio";
 
-const FECHA = new Intl.DateTimeFormat("es-ES", {
+const FECHA = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
   month: "long",
   year: "numeric",
   timeZone: SITIO.zona,
 });
 
-const FECHA_HORA = new Intl.DateTimeFormat("es-ES", {
+const FECHA_HORA = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
   month: "long",
   year: "numeric",
@@ -23,39 +23,38 @@ export function fecha(iso: string | null, conHora = false): string {
   return (conHora ? FECHA_HORA : FECHA).format(valor);
 }
 
-/** "hace 3 h", "ayer"… para las tarjetas del río. */
+/** "3h ago", "yesterday"… para las tarjetas del río. */
 export function haceCuanto(iso: string | null): string {
   if (!iso) return "";
   const valor = new Date(iso).getTime();
   if (Number.isNaN(valor)) return "";
 
   const minutos = Math.round((Date.now() - valor) / 60000);
-  if (minutos < 1) return "ahora";
-  if (minutos < 60) return `hace ${minutos} min`;
+  if (minutos < 1) return "just now";
+  if (minutos < 60) return `${minutos}m ago`;
 
   const horas = Math.round(minutos / 60);
-  if (horas < 24) return `hace ${horas} h`;
+  if (horas < 24) return `${horas}h ago`;
 
   const dias = Math.round(horas / 24);
-  if (dias === 1) return "ayer";
-  if (dias < 30) return `hace ${dias} días`;
+  if (dias === 1) return "yesterday";
+  if (dias < 30) return `${dias} days ago`;
   return fecha(iso);
 }
 
-/** "jueves, 25 de agosto de 2026" con una sola mayúscula inicial. */
+/** "Tuesday, August 25, 2026" para la cabecera. */
 export function fechaLarga(valor: Date): string {
-  const texto = new Intl.DateTimeFormat("es-ES", {
+  return new Intl.DateTimeFormat("en-US", {
     weekday: "long",
-    day: "numeric",
     month: "long",
+    day: "numeric",
     year: "numeric",
     timeZone: SITIO.zona,
   }).format(valor);
-  return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
 export function numero(valor: number): string {
-  return new Intl.NumberFormat("es-ES").format(valor);
+  return new Intl.NumberFormat("en-US").format(valor);
 }
 
 // ---------------------------------------------------------------------------
@@ -63,10 +62,10 @@ export function numero(valor: number): string {
 // ---------------------------------------------------------------------------
 
 export const VERTICALES: Record<string, string> = {
-  noticias: "Noticias",
-  deportes: "Deportes",
-  gamer: "Gamer",
-  tecnologia: "Tecnología",
+  noticias: "News",
+  deportes: "Sports",
+  gamer: "Gaming",
+  tecnologia: "Tech",
 };
 
 /**
@@ -76,37 +75,37 @@ export const VERTICALES: Record<string, string> = {
  * falta cuando se parte de la clave a secas: navegación, migas y sitemaps.
  */
 const NOMBRES: Record<string, string> = {
-  futbol: "Fútbol",
-  baloncesto: "Baloncesto",
+  futbol: "Soccer",
+  baloncesto: "Basketball",
   nfl: "NFL",
-  beisbol: "Béisbol",
-  tenis: "Tenis",
-  motor: "Motor",
+  beisbol: "Baseball",
+  tenis: "Tennis",
+  motor: "Motorsport",
   golf: "Golf",
-  ciclismo: "Ciclismo",
-  combate: "Deportes de combate",
+  ciclismo: "Cycling",
+  combate: "Combat sports",
   cricket: "Cricket",
   rugby: "Rugby",
-  olimpismo: "Olimpismo",
-  otros: "Más deporte",
-  juegos: "Videojuegos",
-  esports: "eSports",
+  olimpismo: "Olympics",
+  otros: "More sport",
+  juegos: "Video games",
+  esports: "Esports",
   streaming: "Streaming",
-  ia: "Inteligencia artificial",
+  ia: "Artificial intelligence",
   gadgets: "Gadgets",
-  empresas: "Empresas",
-  ciencia: "Ciencia y espacio",
-  software: "Software y seguridad",
-  cripto: "Cripto",
-  mundo: "Mundo",
-  politica: "Política",
-  economia: "Economía",
-  sociedad: "Sociedad",
-  salud: "Salud",
-  cultura: "Cultura",
+  empresas: "Companies",
+  ciencia: "Science & space",
+  software: "Software & security",
+  cripto: "Crypto",
+  mundo: "World",
+  politica: "Politics",
+  economia: "Business",
+  sociedad: "Society",
+  salud: "Health",
+  cultura: "Culture",
 };
 
-const MINUSCULAS = new Set(["y", "de", "del", "la", "el", "en", "los", "las", "a"]);
+const MINUSCULAS = new Set(["and", "of", "the", "in", "on", "for", "to", "a", "an"]);
 
 function titulo(texto: string): string {
   if (NOMBRES[texto]) return NOMBRES[texto]!;
@@ -144,7 +143,7 @@ export function nombreVertical(clave: string): string {
 // ---------------------------------------------------------------------------
 
 export function enlaceNoticia(categoria: string, id: string): string {
-  return `/noticia/${categoria}/${id}`;
+  return `/article/${categoria}/${id}`;
 }
 
 export function enlaceVertical(vertical: string, pagina = 1): string {

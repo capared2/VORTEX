@@ -33,7 +33,7 @@ export function organizacion() {
     "@type": "Organization",
     "@id": absoluta("/#organizacion"),
     name: SITIO.nombre,
-    alternateName: "Gigantum News",
+    alternateName: "Gigantum",
     url: SITIO.dominio,
     description: SITIO.descripcion,
     slogan: SITIO.lema,
@@ -62,7 +62,7 @@ export function sitioWeb() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: absoluta("/buscar?q={search_term_string}"),
+        urlTemplate: absoluta("/search?q={search_term_string}"),
       },
       "query-input": "required name=search_term_string",
     },
@@ -82,9 +82,9 @@ export function migas(pasos: { nombre: string; ruta: string }[]) {
   };
 }
 
-/** Migas derivadas de la categoría: "Inicio › Deportes › Fútbol". */
+/** Migas derivadas de la categoría: "Home › Sports › Soccer". */
 export function migasDeCategoria(clave: string) {
-  const pasos = [{ nombre: "Inicio", ruta: "/" }];
+  const pasos = [{ nombre: "Home", ruta: "/" }];
   const partes = clave.split("/");
   for (let i = 0; i < partes.length; i++) {
     const trozo = partes.slice(0, i + 1).join("/");
@@ -135,7 +135,7 @@ export function noticiaJsonLd(noticia: Noticia, imagen: string | null) {
     // Para asistentes de voz: qué leer en alto si alguien pregunta por esto.
     speakable: {
       "@type": "SpeakableSpecification",
-      cssSelector: ["h1", ".entradilla"],
+      cssSelector: ["h1", ".standfirst"],
     },
   };
 }
@@ -181,7 +181,7 @@ export function grafoPortada(historias: Historia[], indice: Indice | null) {
         "@type": "Thing",
         name: nombreVertical(v.vertical),
       })),
-      mainEntity: listado(historias, "Lo último, de todos los nichos"),
+      mainEntity: listado(historias, "Latest across every topic"),
     },
   ];
 }
@@ -197,13 +197,13 @@ export function grafoVertical(
   return [
     organizacion(),
     sitioWeb(),
-    migas([{ nombre: "Inicio", ruta: "/" }, { nombre, ruta: enlaceVertical(vertical) }]),
+    migas([{ nombre: "Home", ruta: "/" }, { nombre, ruta: enlaceVertical(vertical) }]),
     {
       "@type": "CollectionPage",
       "@id": `${url}#coleccion`,
       url,
-      name: `${nombre}: últimas noticias`,
-      description: `Todo lo de ${nombre.toLowerCase()} reunido y ordenado en ${SITIO.nombre}.`,
+      name: `${nombre}: latest news`,
+      description: `Everything on ${nombre.toLowerCase()}, gathered and sorted on ${SITIO.nombre}.`,
       inLanguage: SITIO.idioma,
       isPartOf: { "@id": absoluta("/#sitio") },
       about: { "@type": "Thing", name: nombre },
@@ -212,7 +212,7 @@ export function grafoVertical(
         url: absoluta(enlaceCategoria(t.category)),
         name: nombreTema(t.category),
       })),
-      mainEntity: listado(articulos, `Noticias de ${nombre}`),
+      mainEntity: listado(articulos, `${nombre} news`),
     },
   ];
 }
@@ -228,12 +228,12 @@ export function grafoTema(clave: string, articulos: Noticia[], pagina: number) {
       "@type": "CollectionPage",
       "@id": `${url}#coleccion`,
       url,
-      name: `${nombre}: últimas noticias`,
-      description: `Noticias de ${nombre.toLowerCase()} reunidas en ${SITIO.nombre}.`,
+      name: `${nombre}: latest news`,
+      description: `${nombre} news gathered on ${SITIO.nombre}.`,
       inLanguage: SITIO.idioma,
       isPartOf: { "@id": absoluta("/#sitio") },
       about: { "@type": "Thing", name: nombre },
-      mainEntity: listado(articulos, `Noticias de ${nombre}`),
+      mainEntity: listado(articulos, `${nombre} news`),
     },
   ];
 }
@@ -242,13 +242,13 @@ export function grafoTemas(indice: Indice | null) {
   return [
     organizacion(),
     sitioWeb(),
-    migas([{ nombre: "Inicio", ruta: "/" }, { nombre: "Temas", ruta: "/temas" }]),
+    migas([{ nombre: "Home", ruta: "/" }, { nombre: "Topics", ruta: "/topics" }]),
     {
       "@type": "CollectionPage",
-      "@id": absoluta("/temas#coleccion"),
-      url: absoluta("/temas"),
-      name: "Todos los temas",
-      description: `Los ${indice?.total_categories ?? 0} temas en los que se organiza ${SITIO.nombre}.`,
+      "@id": absoluta("/topics#coleccion"),
+      url: absoluta("/topics"),
+      name: "All topics",
+      description: `The ${indice?.total_categories ?? 0} topics ${SITIO.nombre} is organised into.`,
       inLanguage: SITIO.idioma,
       isPartOf: { "@id": absoluta("/#sitio") },
       hasPart: (indice?.categories ?? []).slice(0, 80).map((c) => ({
@@ -261,7 +261,7 @@ export function grafoTemas(indice: Indice | null) {
 }
 
 export function grafoNoticia(noticia: Noticia, imagen: string | null) {
-  const pasos = [{ nombre: "Inicio", ruta: "/" }];
+  const pasos = [{ nombre: "Home", ruta: "/" }];
   const partes = noticia.category.split("/");
   pasos.push({ nombre: nombreVertical(partes[0]!), ruta: enlaceVertical(partes[0]!) });
   if (partes.length > 1) {
