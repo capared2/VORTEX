@@ -4,10 +4,20 @@ import { grafo } from "../lib/seo";
 
 interface Props {
   titulo: string;
+  /**
+   * El titular a secas, sin el sufijo del sitio.
+   *
+   * Va a `og:title` y a `twitter:title`, que no son lo mismo que `<title>`:
+   * ahí la marca ya la pone `og:site_name`, y repetirla come el espacio del
+   * titular en la tarjeta que se ve al compartir el enlace.
+   */
+  tituloSocial?: string;
   descripcion: string;
   /** Ruta canónica del sitio; se convierte a absoluta. */
   canonical: string;
   imagen?: string | null;
+  /** Qué se ve en la foto. Si falta, se cae al titular. */
+  imagenAlt?: string | null;
   tipo?: "website" | "article";
   publicado?: string | null;
   modificado?: string | null;
@@ -23,9 +33,11 @@ interface Props {
 
 const {
   titulo,
+  tituloSocial,
   descripcion,
   canonical,
   imagen = null,
+  imagenAlt = null,
   tipo = "website",
   publicado = null,
   modificado = null,
@@ -44,6 +56,8 @@ const url = absoluta(canonical);
 // en la vista previa, y el enlace se comparte sin imagen.
 const portada = imagen ? absoluta(imagen) : absoluta("/og.png");
 const portadaPropia = !imagen;
+const social = tituloSocial || titulo;
+const alt = imagenAlt || social;
 
 // Sin límites al fragmento ni a la imagen: es lo que hace que el resultado
 // ocupe más espacio en la página de resultados y se lleve más clics.
@@ -70,19 +84,20 @@ const robots = noindex
   property="og:locale"
   content={idioma === SITIO.idioma ? SITIO.locale : idioma.replace("-", "_")}
 />
-<meta property="og:title" content={titulo} />
+<meta property="og:title" content={social} />
 <meta property="og:description" content={descripcion} />
 <meta property="og:url" content={url} />
 <meta property="og:image" content={portada} />
-<meta property="og:image:alt" content={titulo} />
+<meta property="og:image:alt" content={alt} />
 {portadaPropia && <meta property="og:image:type" content="image/png" />}
 {portadaPropia && <meta property="og:image:width" content="1200" />}
 {portadaPropia && <meta property="og:image:height" content="630" />}
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={titulo} />
+<meta name="twitter:title" content={social} />
 <meta name="twitter:description" content={descripcion} />
 <meta name="twitter:image" content={portada} />
+<meta name="twitter:image:alt" content={alt} />
 
 {tipo === "article" && publicado && <meta property="article:published_time" content={publicado} />}
 {tipo === "article" && modificado && <meta property="article:modified_time" content={modificado} />}
@@ -92,7 +107,7 @@ const robots = noindex
 <link
   rel="alternate"
   type="application/rss+xml"
-  title={`${SITIO.nombre} · lo último`}
+  title={`${SITIO.nombre} · latest`}
   href={absoluta("/rss.xml")}
 />
 <link rel="sitemap" type="application/xml" href={absoluta("/sitemap.xml")} />

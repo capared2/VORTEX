@@ -6,8 +6,15 @@ import Seo from "../components/Seo.astro";
 import type { Indice } from "../lib/types";
 import { SITIO } from "../lib/sitio";
 
+const FUENTES =
+  "https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900" +
+  "&family=Inter:wght@400;500;600;700" +
+  "&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap";
+
 interface Props {
   titulo: string;
+  /** Titular sin el sufijo del sitio, para las tarjetas al compartir. */
+  tituloSocial?: string;
   descripcion?: string;
   /** Ruta canónica de esta página. */
   canonical: string;
@@ -22,6 +29,7 @@ interface Props {
   idioma?: string;
   verticalActiva?: string;
   imagen?: string | null;
+  imagenAlt?: string | null;
   tipo?: "website" | "article";
   publicado?: string | null;
   modificado?: string | null;
@@ -61,10 +69,21 @@ Astro.response.headers.set(
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Las tipografías se cargan sin bloquear el pintado. Una hoja de estilo de
+      otro dominio detiene el primer render hasta que llega, y ese retraso es
+      justo lo que mide el LCP, que sí cuenta para posicionar. Con
+      `media="print"` el navegador la baja con prioridad baja y no espera a
+      ella; al terminar se pasa a `all` y las fuentes entran. El `noscript` es
+      para el rastreador que no ejecuta guiones.
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      href={FUENTES}
       rel="stylesheet"
+      media="print"
+      onload="this.media='all';this.onload=null"
     />
+    <noscript><link href={FUENTES} rel="stylesheet" /></noscript>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="theme-color" content="#4f46e5" />

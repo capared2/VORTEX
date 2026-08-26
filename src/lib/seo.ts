@@ -7,6 +7,7 @@ import {
   nombreCategoria,
   nombreTema,
   nombreVertical,
+  conPagina,
   recortar,
 } from "./formato";
 
@@ -96,6 +97,20 @@ export function migasDeCategoria(clave: string) {
   return migas(pasos);
 }
 
+/**
+ * "sports/soccer" → ["Sports", "Soccer"].
+ *
+ * `articleSection` admite varios valores, y darlos sueltos es lo que permite
+ * a un buscador entender la jerarquía. Una sola cadena con un "·" en medio no
+ * es una sección: es una miga de pan mal puesta.
+ */
+function seccionesDe(clave: string): string[] {
+  const partes = clave.split("/");
+  return partes.map((_, i) =>
+    i === 0 ? nombreVertical(partes[0]!) : nombreTema(partes.slice(0, i + 1).join("/")),
+  );
+}
+
 /** Las etiquetas de una noticia, como entidades que la máquina puede enlazar. */
 function entidades(etiquetas: string[]) {
   return etiquetas.slice(0, 12).map((nombre) => ({ "@type": "Thing", name: nombre }));
@@ -115,7 +130,10 @@ export function noticiaJsonLd(noticia: Noticia, imagen: string | null) {
     headline: recortar(noticia.title, 110),
     alternativeHeadline: noticia.standfirst || undefined,
     description: descripcion || undefined,
-    articleSection: nombreCategoria(noticia.category),
+    // Los nombres de las secciones sueltos. Antes iba `nombreCategoria`, que
+    // devuelve "Sports · Soccer": ese "·" es un separador para la pantalla y
+    // no tiene nada que hacer dentro de un dato estructurado.
+    articleSection: seccionesDe(noticia.category),
     inLanguage: noticia.language || SITIO.idioma,
     datePublished: noticia.published_at || undefined,
     dateModified: noticia.modified_at || noticia.published_at || undefined,
@@ -138,6 +156,18 @@ export function noticiaJsonLd(noticia: Noticia, imagen: string | null) {
       cssSelector: ["h1", ".standfirst"],
     },
   };
+}
+
+/**
+ * Cuándo se movió por última vez una lista.
+ *
+ * Sin esto un buscador no tiene forma de saber que la sección cambió, y la
+ * vuelve a rastrear más de tarde en tarde. La lista llega ya ordenada de más
+ * nueva a más vieja, así que basta con la primera.
+ */
+function frescura(articulos: { modified_at?: string | null; published_at?: string | null }[]) {
+  const primera = articulos[0];
+  return primera?.modified_at || primera?.published_at || undefined;
 }
 
 /** Una lista ordenada de noticias: así se entienden portadas y secciones. */
@@ -202,11 +232,12 @@ export function grafoVertical(
       "@type": "CollectionPage",
       "@id": `${url}#coleccion`,
       url,
-      name: `${nombre}: latest news`,
+      name: conPagina(`${nombre}: latest news`, pagina),
       description: `Everything on ${nombre.toLowerCase()}, gathered and sorted on ${SITIO.nombre}.`,
       inLanguage: SITIO.idioma,
       isPartOf: { "@id": absoluta("/#sitio") },
       about: { "@type": "Thing", name: nombre },
+      dateModified: frescura(articulos),
       hasPart: temas.slice(0, 30).map((t) => ({
         "@type": "CollectionPage",
         url: absoluta(enlaceCategoria(t.category)),
@@ -228,11 +259,12 @@ export function grafoTema(clave: string, articulos: Noticia[], pagina: number) {
       "@type": "CollectionPage",
       "@id": `${url}#coleccion`,
       url,
-      name: `${nombre}: latest news`,
+      name: conPagina(`${nombre}: latest news`, pagina),
       description: `${nombre} news gathered on ${SITIO.nombre}.`,
       inLanguage: SITIO.idioma,
       isPartOf: { "@id": absoluta("/#sitio") },
       about: { "@type": "Thing", name: nombre },
+      dateModified: frescura(articulos),
       mainEntity: listado(articulos, `${nombre} news`),
     },
   ];

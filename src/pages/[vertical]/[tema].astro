@@ -10,6 +10,7 @@ import { TTL } from "../../lib/cache";
 import {
   VERTICALES,
   colorCategoria,
+  conPagina,
   enlaceCategoria,
   enlaceVertical,
   nombreTema,
@@ -45,8 +46,12 @@ const hermanos = (indice?.categories ?? [])
 ---
 
 <Base
-  titulo={`${nombre} · ${SITIO.nombre}`}
-  descripcion={`The latest ${nombre.toLowerCase()} news, gathered and sorted on ${SITIO.nombre}.`}
+  titulo={conPagina(`${nombre} · ${SITIO.nombre}`, resultado.pagina)}
+  tituloSocial={conPagina(nombre, resultado.pagina)}
+  descripcion={conPagina(
+    `The latest ${nombre.toLowerCase()} news, gathered and sorted on ${SITIO.nombre}.`,
+    resultado.pagina,
+  )}
   canonical={enlaceCategoria(clave, resultado.pagina)}
   indice={indice}
   verticalActiva={vertical}

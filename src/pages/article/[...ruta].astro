@@ -48,11 +48,25 @@ const parrafos = MOSTRAR_CUERPO_COMPLETO ? todos : todos.slice(0, PARRAFOS_DE_MU
 const recortada = parrafos.length < todos.length;
 
 const entradilla = noticia.standfirst || noticia.summary;
-const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.body, 180);
+// 160 caracteres: es lo que Google enseña antes de cortar. Con 180 el
+// fragmento salía siempre con puntos suspensivos puestos por él, no por
+// nosotros, y perdíamos la última frase.
+const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.body, 160);
+
+// El titular medio del archivo mide 74 caracteres. Recortarlo a 65 --como se
+// hacía-- partía dos de cada tres por la mitad y dejaba «…» en mitad del
+// `<title>` y de cada tarjeta al compartir. Va entero: el buscador lo recorta
+// al pintarlo, que es reversible, y recortarlo aquí no lo es. Un `<title>`
+// largo no penaliza; lo que penaliza es que el titular llegue mutilado.
+//
+// El tope de 110 es otra cosa y vive solo en los datos estructurados: es el
+// límite a partir del cual Google descarta el `headline`.
 ---
 
 <Base
-  titulo={`${recortar(noticia.title, 65)} · ${SITIO.nombre}`}
+  titulo={`${noticia.title} · ${SITIO.nombre}`}
+  tituloSocial={noticia.title}
+  imagenAlt={pie || noticia.title}
   descripcion={descripcion}
   canonical={`/article/${noticia.category}/${noticia.id}`}
   indice={indice}

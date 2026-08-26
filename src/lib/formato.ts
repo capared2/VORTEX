@@ -206,3 +206,15 @@ export function rutaImagen(url: string | null | undefined): string | null {
     return null;
   }
 }
+
+/**
+ * Marca el número de página en un título o una descripción.
+ *
+ * Sin esto, `/sports`, `/sports?p=2` y `/sports?p=9` se declaran con el mismo
+ * `<title>` y la misma descripción palabra por palabra. Cada una es canónica
+ * de sí misma --que es lo correcto-- así que el buscador acaba con nueve
+ * páginas indexadas que dicen lo mismo, y se queda con una.
+ */
+export function conPagina(texto: string, pagina: number): string {
+  return pagina > 1 ? `${texto} · Page ${pagina}` : texto;
+}

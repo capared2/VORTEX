@@ -11,6 +11,7 @@ import {
   VERTICALES,
   colorCategoria,
   colorVertical,
+  conPagina,
   enlaceCategoria,
   enlaceVertical,
   nombreTema,
@@ -43,8 +44,12 @@ const acento = colorVertical(vertical);
 ---
 
 <Base
-  titulo={`${nombre} · ${SITIO.nombre}`}
-  descripcion={`Everything on ${nombre.toLowerCase()}, gathered and sorted by topic on ${SITIO.nombre}.`}
+  titulo={conPagina(`${nombre} · ${SITIO.nombre}`, resultado.pagina)}
+  tituloSocial={conPagina(nombre, resultado.pagina)}
+  descripcion={conPagina(
+    `Everything on ${nombre.toLowerCase()}, gathered and sorted by topic on ${SITIO.nombre}.`,
+    resultado.pagina,
+  )}
   canonical={enlaceVertical(vertical, resultado.pagina)}
   indice={indice}
   verticalActiva={vertical}
