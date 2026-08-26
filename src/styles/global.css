@@ -20,16 +20,19 @@
   --color-lienzo-alt: #eceff5;
   --color-linea: #e0e4ec;
 
-  /* ---- Color por tema -------------------------------------------------
-     Un río en el que se mezcla todo necesita que el color diga de qué va
-     cada pieza antes de leerla. Cada nicho tiene su familia y cada tema su
-     tono dentro de ella, así que se distinguen entre sí sin dejar de
-     parecer del mismo sitio.
+}
 
-     Van en CSS y no en JavaScript a propósito: así el tema oscuro puede
-     aclararlos, que es lo que antes no ocurría --los colores venían en
-     hexadecimal desde el código y se quedaban igual de oscuros sobre
-     fondo negro--. */
+/* ---- Color por tema ----------------------------------------------------
+   Van en un `:root` normal y NO dentro de `@theme`.
+
+   Tailwind v4 no emite las variables de `@theme` que ningún utility use:
+   como estas se leen desde `style=""` en tiempo de ejecución, las daba por
+   muertas y las quitaba del CSS. Resultado: en modo claro `--c-soccer` no
+   existía, la cadena `var(--c-soccer, var(--v-sports, var(--color-marca)))`
+   caía hasta el final y las treinta y dos categorías salían del mismo índigo.
+   Solo se salvaban en oscuro, porque esos valores ya vivían en una regla
+   corriente. */
+:root {
 
   --v-news: #2f6df6;
   --v-sports: #12a150;
@@ -199,6 +202,105 @@
 
   &:hover {
     color: var(--acento, var(--color-marca));
+  }
+}
+
+/* ---- Superficie de color ---------------------------------------------
+   La paleta estaba, pero solo pintaba una etiqueta de diez píxeles y una
+   línea de dos: el sitio se leía azul y blanco. Estas utilidades le dan
+   sitio de verdad.
+
+   Los tintes salen del propio acento con `color-mix`, así que basta con
+   fijar `--acento` una vez por componente y todo lo demás --fondo, borde,
+   hover-- cae solo, en claro y en oscuro. */
+
+/* Píldora con el color del tema: fondo teñido y texto del acento. */
+@utility chip-tema {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--acento, var(--color-marca));
+  background: color-mix(in oklab, var(--acento, var(--color-marca)) 14%, transparent);
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: color-mix(in oklab, var(--acento, var(--color-marca)) 24%, transparent);
+  }
+}
+
+/* Tarjeta que reacciona con su color en vez de con un gris. */
+@utility tarjeta-tema {
+  border: 1px solid var(--color-linea);
+  border-top: 3px solid var(--acento, var(--color-marca));
+  border-radius: 0.6rem;
+  background: var(--color-lienzo);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: color-mix(in oklab, var(--acento, var(--color-marca)) 5%, var(--color-lienzo));
+    border-color: color-mix(in oklab, var(--acento, var(--color-marca)) 35%, var(--color-linea));
+    box-shadow: 0 6px 20px -12px color-mix(in oklab, var(--acento, var(--color-marca)) 70%, transparent);
+  }
+}
+
+/* Banda de sección: el nicho se reconoce por el color antes de leer nada. */
+@utility banda-tema {
+  border-radius: 0.6rem;
+  padding: 1rem 1.15rem;
+  border-left: 5px solid var(--acento, var(--color-marca));
+  background: linear-gradient(
+    100deg,
+    color-mix(in oklab, var(--acento, var(--color-marca)) 13%, transparent),
+    transparent 72%
+  );
+}
+
+/* Distintivo relleno, para el número de medios que cuentan una historia. */
+@utility marca-tema {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--acento, var(--color-marca));
+  background: color-mix(in oklab, var(--acento, var(--color-marca)) 16%, transparent);
+}
+
+/* Cada tema del índice, con su color de fondo y no solo una raya al lado. */
+@utility ficha-tema {
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--acento, var(--color-marca)) 28%, var(--color-linea));
+  border-left: 4px solid var(--acento, var(--color-marca));
+  background: color-mix(in oklab, var(--acento, var(--color-marca)) 7%, var(--color-lienzo));
+
+  &:hover {
+    background: color-mix(in oklab, var(--acento, var(--color-marca)) 16%, var(--color-lienzo));
+  }
+}
+
+/* Cada nicho de la navegación con su color: apagado en reposo para que no
+   compita con los titulares, encendido al pasar por encima y macizo cuando es
+   la sección en la que estás. */
+@utility nicho {
+  color: var(--acento, var(--color-marca));
+
+  &:hover {
+    background: color-mix(in oklab, var(--acento, var(--color-marca)) 14%, transparent);
+  }
+}
+
+@utility nicho-activo {
+  color: #fff;
+  background: var(--acento, var(--color-marca));
+
+  &:hover {
+    background: color-mix(in oklab, var(--acento, var(--color-marca)) 85%, #000);
   }
 }
 

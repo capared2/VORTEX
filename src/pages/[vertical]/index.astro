@@ -58,7 +58,7 @@ const acento = colorVertical(vertical);
   anterior={resultado.pagina > 1 ? enlaceVertical(vertical, resultado.pagina - 1) : null}
   siguiente={resultado.pagina < resultado.paginas ? enlaceVertical(vertical, resultado.pagina + 1) : null}
 >
-  <header class="mb-5 border-b-2 pb-3" style={`border-color:${acento}`}>
+  <header class="banda-tema mb-5" style={`--acento:${acento}`}>
     <p class="text-xs font-bold uppercase tracking-wider" style={`color:${acento}`}>Section</p>
     <h1 class="font-display text-3xl font-extrabold tracking-tight">{nombre}</h1>
     <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">

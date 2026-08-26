@@ -38,15 +38,11 @@ const acento = colorCategoria(articulo.category);
 {
   variante === "titular" ? (
     <article class="filo-lado py-2.5 pl-3.5" style={`--acento:${acento}`}>
-      <a
-        href={enlaceCategoria(articulo.category)}
-        class="text-[0.62rem] font-bold uppercase tracking-wider hover:underline"
-        style={`color:${acento}`}
-      >
+      <a href={enlaceCategoria(articulo.category)} class="chip-tema">
         {tema}
       </a>
-      <h3 class="lineas-3 mt-0.5 font-display text-[0.95rem] font-bold leading-snug">
-        <a href={enlace} class="hover:text-[var(--color-marca)]">
+      <h3 class="lineas-3 mt-1 font-display text-[0.95rem] font-bold leading-snug">
+        <a href={enlace} class="enlace-tema">
           {articulo.title}
         </a>
       </h3>
@@ -54,11 +50,14 @@ const acento = colorCategoria(articulo.category);
         {articulo.published_at && (
           <time datetime={articulo.published_at}>{haceCuanto(articulo.published_at)}</time>
         )}
-        {coberturas > 1 && <span>· {coberturas} takes</span>}
+        {coberturas > 1 && <span class="marca-tema">{coberturas} takes</span>}
       </div>
     </article>
   ) : variante === "compacta" ? (
-    <article class="group flex gap-3 border-b border-[var(--color-linea)] pb-3 last:border-0">
+    <article
+      class="group flex gap-3 border-b border-[var(--color-linea)] pb-3 last:border-0"
+      style={`--acento:${acento}`}
+    >
       {imagen && (
         <a
           href={enlace}
@@ -79,15 +78,11 @@ const acento = colorCategoria(articulo.category);
         </a>
       )}
       <div class="min-w-0">
-        <a
-          href={enlaceCategoria(articulo.category)}
-          class="text-[0.62rem] font-bold uppercase tracking-wider hover:underline"
-          style={`color:${acento}`}
-        >
+        <a href={enlaceCategoria(articulo.category)} class="chip-tema">
           {tema}
         </a>
-        <h3 class="lineas-3 font-display text-[0.95rem] font-bold leading-snug">
-          <a href={enlace} class="hover:text-[var(--color-marca)]">
+        <h3 class="lineas-3 mt-1 font-display text-[0.95rem] font-bold leading-snug">
+          <a href={enlace} class="enlace-tema">
             {articulo.title}
           </a>
         </h3>
@@ -95,14 +90,14 @@ const acento = colorCategoria(articulo.category);
           {articulo.published_at && (
             <time datetime={articulo.published_at}>{haceCuanto(articulo.published_at)}</time>
           )}
-          {coberturas > 1 && <span>· {coberturas} takes</span>}
+          {coberturas > 1 && <span class="marca-tema">{coberturas} takes</span>}
         </div>
       </div>
     </article>
   ) : (
     <article
       class:list={[
-        "filo group flex flex-col overflow-hidden rounded-xl border border-[var(--color-linea)] bg-[var(--color-lienzo)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg",
+        "tarjeta-tema group flex flex-col overflow-hidden transition hover:-translate-y-0.5",
         variante === "apertura" && "md:flex-row",
       ]}
       style={`--acento:${acento}`}
@@ -134,17 +129,12 @@ const acento = colorCategoria(articulo.category);
 
       <div class="flex flex-1 flex-col p-4">
         <div class="flex items-center gap-2">
-          <a
-            href={enlaceCategoria(articulo.category)}
-            class="text-[0.65rem] font-bold uppercase tracking-wider hover:underline"
-            style={`color:${acento}`}
-          >
+          <a href={enlaceCategoria(articulo.category)} class="chip-tema">
             {tema}
           </a>
           {coberturas > 1 && (
             <span
-              class="rounded-full px-1.5 py-px text-[0.6rem] font-bold uppercase tracking-wide text-white"
-              style={`background:${acento}`}
+              class="marca-tema"
               title="How many separate takes on this same story are collected"
             >
               {coberturas} takes
@@ -158,7 +148,7 @@ const acento = colorCategoria(articulo.category);
             variante === "apertura" ? "lineas-4 text-2xl md:text-3xl" : "lineas-3 text-lg",
           ]}
         >
-          <a href={enlace} class="hover:text-[var(--color-marca)]">
+          <a href={enlace} class="enlace-tema">
             {articulo.title}
           </a>
         </h3>

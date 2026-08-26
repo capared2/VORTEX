@@ -68,7 +68,10 @@ const hermanos = (indice?.categories ?? [])
     </a>
   </nav>
 
-  <header class="mb-6 border-b-2 pb-3" style={`border-color:${acento}`}>
+  <header class="banda-tema mb-6" style={`--acento:${acento}`}>
+    <p class="text-xs font-bold uppercase tracking-wider" style={`color:${acento}`}>
+      {nombreVertical(vertical)}
+    </p>
     <h1 class="font-display text-3xl font-extrabold tracking-tight">{nombre}</h1>
     <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">
       {numero(resultado.total)} stories

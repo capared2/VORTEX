@@ -44,7 +44,7 @@ const verticales = indice?.verticals ?? [];
         const acento = colorVertical(vertical.vertical);
         return (
           <section>
-            <h2 class="mb-3 border-b-2 pb-1.5" style={`border-color:${acento}`}>
+            <h2 class="banda-tema mb-3 py-2.5" style={`--acento:${acento}`}>
               <a
                 href={enlaceVertical(vertical.vertical)}
                 class="font-display text-xl font-extrabold tracking-tight hover:brightness-110"
@@ -61,7 +61,7 @@ const verticales = indice?.verticals ?? [];
                 <li>
                   <a
                     href={enlaceCategoria(tema.category)}
-                    class="filo-lado flex items-baseline justify-between gap-3 rounded-lg border border-[var(--color-linea)] bg-[var(--color-lienzo)] px-3.5 py-2.5 transition hover:-translate-y-0.5 hover:shadow-sm"
+                    class="ficha-tema flex items-baseline justify-between gap-3 px-3.5 py-2.5 transition hover:-translate-y-0.5"
                     style={`--acento:${colorCategoria(tema.category)}`}
                   >
                     <span
