@@ -181,10 +181,11 @@ export async function obtenerPaginaVertical(
   porPagina: number,
 ): Promise<Pagina> {
   const total = temas.reduce((suma, c) => suma + c.articles, 0);
-  const paginas = Math.max(1, Math.ceil(total / porPagina));
-  const actual = Math.min(Math.max(1, pagina), paginas);
+  // Lo que se pide, acotado al fondo del nicho. Todavía no es la página que se
+  // va a servir: cuántas hay de verdad no se sabe hasta ver qué se ha reunido.
+  const pedida = Math.min(Math.max(1, pagina), Math.max(1, Math.ceil(total / porPagina)));
 
-  const necesarias = actual * porPagina * MARGEN;
+  const necesarias = pedida * porPagina * MARGEN;
   const minimo = Math.min(temas.length, MIN_TEMAS);
 
   const candidatos = [...temas]
@@ -210,13 +211,22 @@ export async function obtenerPaginaVertical(
   );
 
   const articulos = porFecha(lotes.flatMap((parte) => parte?.articles ?? []));
+
+  // Cuántas páginas se pueden servir de verdad, que no son las que da el fondo
+  // del nicho: aquí solo se descarga el archivo más reciente de unos pocos
+  // temas. Sin acotar a esto, `/news?p=30` devolvía un listado vacío con un
+  // 200, su propia canónica y `robots: index` --una página sin nada dentro
+  // invitada a indexarse, y hay 250 así por nicho--. Se sirve la última con
+  // contenido y la canónica apunta a ella, que es lo que ya hacía un tema.
+  const paginas = Math.max(1, Math.ceil(articulos.length / porPagina));
+  const actual = Math.min(pedida, paginas);
   const desde = (actual - 1) * porPagina;
 
   return {
     articulos: articulos.slice(desde, desde + porPagina),
     total,
     pagina: actual,
-    paginas: Math.max(1, Math.ceil(articulos.length / porPagina)),
+    paginas,
   };
 }
 
