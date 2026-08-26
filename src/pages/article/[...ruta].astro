@@ -1,6 +1,8 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Tarjeta from "../../components/Tarjeta.astro";
+import Banner from "../../components/Banner.astro";
+import BannerNativo from "../../components/BannerNativo.astro";
 import { contextoDe, TTL } from "../../lib/cache";
 import { obtenerContexto, obtenerIndice, obtenerNoticia } from "../../lib/datos";
 import { grafoNoticia } from "../../lib/seo";
@@ -46,6 +48,12 @@ const pie = noticia.images?.[0]?.caption;
 const todos = noticia.body ? noticia.body.split("\n\n") : [];
 const parrafos = MOSTRAR_CUERPO_COMPLETO ? todos : todos.slice(0, PARRAFOS_DE_MUESTRA);
 const recortada = parrafos.length < todos.length;
+
+// El cuerpo se parte en dos para colocar un anuncio dentro del texto, que
+// es donde más se mira. Tres párrafos por delante: con menos cae antes de
+// que la noticia haya arrancado.
+const primeros = parrafos.slice(0, 3);
+const siguientes = parrafos.slice(3);
 
 const entradilla = noticia.standfirst || noticia.summary;
 // 160 caracteres: es lo que Google enseña antes de cortar. Con 180 el
@@ -160,7 +168,14 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
       }
 
       <div class="prosa mt-6 max-w-[68ch]" style={`--acento:${acento}`}>
-        {parrafos.map((parrafo) => <p>{parrafo}</p>)}
+        {primeros.map((parrafo) => <p>{parrafo}</p>)}
+
+        {siguientes.length > 0 && (
+          <Banner hueco="rectangulo" clase="my-6 sm:float-right sm:ml-6 sm:mb-4" />
+        )}
+
+        {siguientes.map((parrafo) => <p>{parrafo}</p>)}
+        <div class="clear-both" />
       </div>
 
       {
@@ -170,6 +185,8 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
           </p>
         )
       }
+
+      <BannerNativo clase="mt-8 max-w-[68ch]" />
 
       {
         noticia.tags.length > 0 && (
@@ -235,6 +252,14 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
           </section>
         )
       }
+
+      <Banner hueco="vertical" clase="lg:sticky lg:top-24" />
+      <Banner hueco="columna" />
     </aside>
   </div>
+
+  {/* Fuera de la rejilla a propósito: dentro de la columna del artículo,
+      a 1024px solo hay 711px y el banner de 728 salía recortado. Aquí
+      tiene el ancho entero del contenedor en cualquier pantalla. */}
+  <Banner hueco="horizontal" clase="mt-10" />
 </Base>

@@ -2,6 +2,8 @@
 import Base from "../layouts/Base.astro";
 import Tarjeta from "../components/Tarjeta.astro";
 import Vacio from "../components/Vacio.astro";
+import Banner from "../components/Banner.astro";
+import BannerNativo from "../components/BannerNativo.astro";
 import { obtenerIndice, obtenerUltimas, porHistoria } from "../lib/datos";
 import { SITIO } from "../lib/sitio";
 import { TTL } from "../lib/cache";
@@ -78,6 +80,8 @@ const resultados = terminos.length
     </p>
   </header>
 
+  <Banner hueco="horizontal" clase="mb-6" />
+
   {
     !consulta ? null : resultados.length === 0 ? (
       <Vacio
@@ -93,7 +97,11 @@ const resultados = terminos.length
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {resultados.map((articulo) => <Tarjeta articulo={articulo} />)}
         </div>
+
+        <BannerNativo clase="mt-8" />
       </>
     )
   }
+
+  <Banner hueco="franja" clase="mt-8" />
 </Base>

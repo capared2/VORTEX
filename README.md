@@ -104,6 +104,58 @@ cruzados (`src/lib/seo.ts`):
   expresamente a los rastreadores de los asistentes: que citen el sitio es el
   objetivo.
 
+## Publicidad
+
+Banners display integrados en el contenido. El catálogo de unidades está en
+`src/lib/anuncios.ts` y se colocan con `<Banner hueco="..." />`.
+
+| Hueco | Escritorio | Móvil |
+| --- | --- | --- |
+| `horizontal` | 728×90 | 320×50 |
+| `franja` | 468×60 | 320×50 |
+| `rectangulo` | 300×250 | 300×250 |
+| `vertical` | 160×600 desde `lg` | no se carga |
+| `columna` | 160×300 desde `lg` | no se carga |
+
+Dónde van:
+
+- **Noticia**: rectángulo flotado tras el tercer párrafo —el texto lo envuelve—,
+  nativo tras el cuerpo, los dos rascacielos en la barra lateral y una franja
+  ancha al cerrar, fuera de la rejilla.
+- **Portada**: franja tras la portadilla, las dos unidades de 160 en la columna
+  de «As it happens», otra franja tras el río, un rectángulo cada seis tarjetas,
+  nativo antes de las tiras por nicho y cierre abajo.
+- **Sección y tema**: franja tras la portadilla, un rectángulo cada seis
+  tarjetas, franja antes de la paginación, nativo y cierre.
+- **Temas, búsqueda y 404**: franja arriba, nativo en medio y cierre abajo.
+
+Los dos rascacielos solo se piden desde `lg`, que es cuando la barra lateral
+está de verdad al lado del contenido; por debajo pasa a ir debajo y ahí no
+pintan nada. El catálogo no da unidad para esa anchura, así que el hueco se
+apaga solo y ni se pide.
+
+Cuatro decisiones que hacen que esto funcione:
+
+1. **Cada banner va en su propio iframe.** Todos los `invoke.js` leen la global
+   `atOptions`; compartiendo página se pisarían la variable y acabarían
+   mostrando todos la misma unidad, o ninguna.
+2. **De cada hueco se carga una sola unidad**, la que corresponde a la pantalla.
+   Cargar varias y ocultar las que sobran contaría impresiones que nadie ve, y
+   eso es tráfico inválido.
+3. **Se cargan al acercarse a la vista**, con 600 px de margen, y con la altura
+   reservada de antemano para que nada salte al aparecer.
+4. **La barra social no tiene hueco en el HTML**: se pide una vez por página y
+   la red la coloca por su cuenta. Como no ocupa sitio en el documento, no
+   espera al scroll.
+
+Cada banner tiene que caber entero donde se pone, o la creatividad sale
+recortada dentro de su iframe. Por eso en la barra lateral van las dos unidades
+de 160 y no el rectángulo de 300 —que no cabe hasta pasados los 1180px—, y por
+eso la franja ancha de la noticia va fuera de la rejilla: dentro de la columna
+del artículo, a 1024px solo hay 711px para un banner de 728.
+
+Se apagan con `ANUNCIOS=0`.
+
 ## Desarrollo
 
 ```bash

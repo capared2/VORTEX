@@ -4,6 +4,8 @@ import { obtenerIndice } from "../lib/datos";
 import { grafoTemas } from "../lib/seo";
 import { SITIO } from "../lib/sitio";
 import { TTL } from "../lib/cache";
+import Banner from "../components/Banner.astro";
+import BannerNativo from "../components/BannerNativo.astro";
 import {
   colorCategoria,
   colorVertical,
@@ -36,6 +38,8 @@ const verticales = indice?.verticals ?? [];
       )
     }
   </header>
+
+  <Banner hueco="horizontal" clase="mb-6" />
 
   <div class="space-y-9">
     {
@@ -82,4 +86,7 @@ const verticales = indice?.verticals ?? [];
       })
     }
   </div>
+
+  <BannerNativo clase="mt-10" />
+  <Banner hueco="franja" clase="mt-8" />
 </Base>

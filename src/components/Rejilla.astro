@@ -1,15 +1,18 @@
 ---
 import type { Historia, Noticia, Tarjeta } from "../lib/types";
 import TarjetaArticulo from "./Tarjeta.astro";
+import Banner from "./Banner.astro";
 
 interface Props {
   articulos: (Tarjeta | Noticia | Historia)[];
   /** La primera se pinta a lo grande, como apertura. */
   conApertura?: boolean;
   columnas?: 2 | 3;
+  /** Intercala un anuncio cada N tarjetas, ocupando el sitio de una. */
+  anuncioCada?: number;
 }
 
-const { articulos, conApertura = false, columnas = 3 } = Astro.props;
+const { articulos, conApertura = false, columnas = 3, anuncioCada = 0 } = Astro.props;
 
 const apertura = conApertura ? articulos[0] : undefined;
 const resto = conApertura ? articulos.slice(1) : articulos;
@@ -24,6 +27,17 @@ const resto = conApertura ? articulos.slice(1) : articulos;
   ]}
 >
   {resto.map((articulo, indice) => (
-    <TarjetaArticulo articulo={articulo} prioritaria={!conApertura && indice < 3} />
+    <>
+      <TarjetaArticulo articulo={articulo} prioritaria={!conApertura && indice < 3} />
+      {/* Ocupa el sitio de una tarjeta: el rectángulo mide casi lo mismo que
+          una, así que la rejilla no se descuadra. No se pone al final, que
+          ahí no lo ve nadie. */}
+      {anuncioCada > 0 && (indice + 1) % anuncioCada === 0 && indice + 1 < resto.length && (
+        <Banner
+          hueco="rectangulo"
+          clase="justify-center rounded-xl border border-dashed border-[var(--color-linea)] py-4"
+        />
+      )}
+    </>
   ))}
 </div>

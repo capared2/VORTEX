@@ -3,6 +3,8 @@ import Base from "../layouts/Base.astro";
 import Rejilla from "../components/Rejilla.astro";
 import Tarjeta from "../components/Tarjeta.astro";
 import Vacio from "../components/Vacio.astro";
+import Banner from "../components/Banner.astro";
+import BannerNativo from "../components/BannerNativo.astro";
 import { obtenerIndice, obtenerPortada, obtenerUltimas, porHistoria } from "../lib/datos";
 import { grafoPortada } from "../lib/seo";
 import { SITIO } from "../lib/sitio";
@@ -97,6 +99,8 @@ const nichos = (indice?.verticals ?? [])
           </div>
         </header>
 
+        <Banner hueco="horizontal" clase="mb-6" />
+
         <div class="grid gap-7 lg:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)]">
           <div>
             <Rejilla articulos={apertura} conApertura columnas={2} />
@@ -111,17 +115,28 @@ const nichos = (indice?.verticals ?? [])
                 <Tarjeta articulo={articulo} variante="titular" />
               ))}
             </div>
+
+            {/* Las dos de 160: el rectángulo de 300 no cabe en esta columna
+                hasta pasados los 1180px, y hasta ahí salía recortado dentro
+                de su iframe. El de 300 ya va intercalado en la rejilla de
+                abajo, donde tiene el ancho de una tarjeta entera. */}
+            <Banner hueco="columna" clase="mt-6" />
+            <Banner hueco="vertical" clase="mt-6 lg:sticky lg:top-24" />
           </aside>
         </div>
+
+        <Banner hueco="franja" clase="mt-8" />
 
         {resto.length > 0 && (
           <section class="mt-10">
             <h2 class="mb-4 border-b border-[var(--color-linea)] pb-2 font-display text-lg font-extrabold tracking-tight">
               More stories
             </h2>
-            <Rejilla articulos={resto} />
+            <Rejilla articulos={resto} anuncioCada={6} />
           </section>
         )}
+
+        <BannerNativo clase="mt-10" />
 
         {nichos.length > 0 && (
           <section class="mt-12">
@@ -156,6 +171,8 @@ const nichos = (indice?.verticals ?? [])
             </div>
           </section>
         )}
+
+        <Banner hueco="horizontal" clase="mt-12" />
       </>
     )
   }

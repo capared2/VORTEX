@@ -3,6 +3,8 @@ import Base from "../../layouts/Base.astro";
 import Rejilla from "../../components/Rejilla.astro";
 import Paginacion from "../../components/Paginacion.astro";
 import Vacio from "../../components/Vacio.astro";
+import Banner from "../../components/Banner.astro";
+import BannerNativo from "../../components/BannerNativo.astro";
 import { obtenerIndice, obtenerPaginaVertical } from "../../lib/datos";
 import { grafoVertical } from "../../lib/seo";
 import { SITIO } from "../../lib/sitio";
@@ -96,12 +98,20 @@ const acento = colorVertical(vertical);
     </nav>
   </header>
 
+  <Banner hueco="horizontal" clase="mb-6" />
+
   {
     resultado.articulos.length === 0 ? (
       <Vacio titulo="No stories in this section yet" />
     ) : (
       <>
-        <Rejilla articulos={resultado.articulos} conApertura={resultado.pagina === 1} />
+        <Rejilla
+          articulos={resultado.articulos}
+          conApertura={resultado.pagina === 1}
+          anuncioCada={6}
+        />
+
+        <Banner hueco="franja" clase="mt-8" />
         <Paginacion
           pagina={resultado.pagina}
           paginas={resultado.paginas}
@@ -110,4 +120,7 @@ const acento = colorVertical(vertical);
       </>
     )
   }
+
+  <BannerNativo clase="mt-10" />
+  <Banner hueco="horizontal" clase="mt-8" />
 </Base>

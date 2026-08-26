@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import Tarjeta from "../components/Tarjeta.astro";
 import { obtenerIndice, obtenerUltimas, porHistoria } from "../lib/datos";
 import { SITIO } from "../lib/sitio";
+import Banner from "../components/Banner.astro";
 
 const [indice, ultimas] = await Promise.all([obtenerIndice(), obtenerUltimas()]);
 const sugerencias = porHistoria(ultimas?.articles ?? []).slice(0, 6);
@@ -39,6 +40,8 @@ Astro.response.status = 404;
         Browse topics
       </a>
     </div>
+
+    <Banner hueco="rectangulo" clase="mt-8" />
   </div>
 
   {
@@ -51,4 +54,6 @@ Astro.response.status = 404;
       </section>
     )
   }
+
+  <Banner hueco="horizontal" clase="mt-10" />
 </Base>
