@@ -62,10 +62,10 @@ export function numero(valor: number): string {
 // ---------------------------------------------------------------------------
 
 export const VERTICALES: Record<string, string> = {
-  noticias: "News",
-  deportes: "Sports",
-  gamer: "Gaming",
-  tecnologia: "Tech",
+  news: "News",
+  sports: "Sports",
+  gaming: "Gaming",
+  tech: "Tech",
 };
 
 /**
@@ -75,34 +75,34 @@ export const VERTICALES: Record<string, string> = {
  * falta cuando se parte de la clave a secas: navegación, migas y sitemaps.
  */
 const NOMBRES: Record<string, string> = {
-  futbol: "Soccer",
-  baloncesto: "Basketball",
+  soccer: "Soccer",
+  basketball: "Basketball",
   nfl: "NFL",
-  beisbol: "Baseball",
-  tenis: "Tennis",
-  motor: "Motorsport",
+  baseball: "Baseball",
+  tennis: "Tennis",
+  motorsport: "Motorsport",
   golf: "Golf",
-  ciclismo: "Cycling",
-  combate: "Combat sports",
+  cycling: "Cycling",
+  combat: "Combat sports",
   cricket: "Cricket",
   rugby: "Rugby",
-  olimpismo: "Olympics",
-  otros: "More sport",
-  juegos: "Video games",
+  olympics: "Olympics",
+  more: "More sport",
+  games: "Video games",
   esports: "Esports",
   streaming: "Streaming",
-  ia: "Artificial intelligence",
+  ai: "Artificial intelligence",
   gadgets: "Gadgets",
-  empresas: "Companies",
-  ciencia: "Science & space",
+  companies: "Companies",
+  science: "Science & space",
   software: "Software & security",
-  cripto: "Crypto",
-  mundo: "World",
-  politica: "Politics",
-  economia: "Business",
-  sociedad: "Society",
-  salud: "Health",
-  cultura: "Culture",
+  crypto: "Crypto",
+  world: "World",
+  politics: "Politics",
+  business: "Business",
+  society: "Society",
+  health: "Health",
+  culture: "Culture",
 };
 
 const MINUSCULAS = new Set(["and", "of", "the", "in", "on", "for", "to", "a", "an"]);
