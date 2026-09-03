@@ -11,6 +11,8 @@ export const SITIO = {
   locale: "en_US",
   pais: "US",
   zona: "America/New_York",
+  /** Identificador de medición de Google Analytics (gtag.js). */
+  analitica: "G-DGGMCMPQ13",
 } as const;
 
 /**
