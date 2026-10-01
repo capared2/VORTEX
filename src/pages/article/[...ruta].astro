@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import Tarjeta from "../../components/Tarjeta.astro";
 import Banner from "../../components/Banner.astro";
 import BannerNativo from "../../components/BannerNativo.astro";
+import EnlacePatrocinado from "../../components/EnlacePatrocinado.astro";
 import { contextoDe, TTL } from "../../lib/cache";
 import { obtenerContexto, obtenerIndice, obtenerNoticia } from "../../lib/datos";
 import { grafoNoticia } from "../../lib/seo";
@@ -253,6 +254,7 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
         )
       }
 
+      <EnlacePatrocinado />
       <Banner hueco="vertical" clase="lg:sticky lg:top-24" />
       <Banner hueco="columna" />
     </aside>

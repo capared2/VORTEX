@@ -54,6 +54,26 @@ export const NATIVO = {
  */
 export const SUELTO = "https://pl31044383.profitableratecpmnetwork.com/62/12/16/62121633365e3b385b6e23f28f0f3e36.js";
 
+/**
+ * La unidad discreta. Tampoco tiene hueco, pero esta se lleva con cuidado
+ * para que no estorbe: no se pide hasta que el visitante hace algo en la
+ * página (mover, tocar, pulsar una tecla) y el navegador queda libre, y a
+ * cada visitante se le pide como mucho una vez cada `cadaHoras`. Así nunca se
+ * lleva el primer clic de nadie, no compite con la carga y no se repite
+ * página tras página.
+ */
+export const DISCRETO = {
+  script: "https://pl31607483.profitableratecpmnetwork.com/5c/4b/6b/5c4b6b3ba9c648c31b51ffd2ef19ca92.js",
+  cadaHoras: 6,
+};
+
+/**
+ * Enlace directo de la red. No se dispara solo ni se cuelga de otros enlaces:
+ * es un enlace normal, rotulado como patrocinado, que solo abre quien lo pulsa.
+ */
+export const ENLACE_PATROCINADO =
+  "https://www.profitableratecpmnetwork.com/c42ufq3v?key=17d56bf790420b47d69c34b71fb3ad3b";
+
 export const BASE_INVOKE = "https://www.highrevenueformat.com";
 
 /** Altura que se reserva antes de cargar, para que nada salte al aparecer. */

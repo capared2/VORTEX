@@ -1,5 +1,5 @@
 ---
-import { BASE_INVOKE, HUECOS, NATIVO, SUELTO } from "../lib/anuncios";
+import { BASE_INVOKE, DISCRETO, HUECOS, NATIVO, SUELTO } from "../lib/anuncios";
 
 /**
  * Carga los banners que haya declarado la página.
@@ -23,6 +23,7 @@ const codigo = `
   var BASE = ${JSON.stringify(BASE_INVOKE)};
   var NATIVO = ${JSON.stringify(NATIVO)};
   var SUELTO = ${JSON.stringify(SUELTO)};
+  var DISCRETO = ${JSON.stringify(DISCRETO)};
 
   function unidadPara(hueco) {
     var variantes = HUECOS[hueco] || [];
@@ -84,11 +85,51 @@ const codigo = `
     document.body.appendChild(s);
   }
 
+  // La unidad discreta se pide como mucho una vez cada DISCRETO.cadaHoras por
+  // visitante, y solo cuando ya ha hecho algo en la página y el navegador está
+  // libre. Se carga después del gesto, no durante: el primer clic de cada
+  // visita siempre es del lector.
+  function pintarDiscreto() {
+    var CLAVE = "anuncio-discreto";
+    try {
+      var ultima = Number(localStorage.getItem(CLAVE)) || 0;
+      if (Date.now() - ultima < DISCRETO.cadaHoras * 3600000) return;
+    } catch (e) {
+      // Sin almacenamiento no hay forma de espaciarla, y entonces no se pide.
+      return;
+    }
+
+    var GESTOS = ["pointerdown", "keydown", "touchstart", "scroll"];
+    var pedido = false;
+
+    function cargar() {
+      try { localStorage.setItem(CLAVE, String(Date.now())); } catch (e) {}
+      var s = document.createElement("script");
+      s.src = DISCRETO.script;
+      s.async = true;
+      s.setAttribute("data-cfasync", "false");
+      document.body.appendChild(s);
+    }
+
+    function alGesto() {
+      if (pedido) return;
+      pedido = true;
+      GESTOS.forEach(function (g) { removeEventListener(g, alGesto, true); });
+      if (window.requestIdleCallback) requestIdleCallback(cargar, { timeout: 3000 });
+      else setTimeout(cargar, 1500);
+    }
+
+    GESTOS.forEach(function (g) {
+      addEventListener(g, alGesto, { capture: true, passive: true });
+    });
+  }
+
   function arrancar() {
     var cajas = [].slice.call(document.querySelectorAll("[data-anuncio]"));
     var nativos = [].slice.call(document.querySelectorAll("[data-anuncio-nativo]"));
 
     pintarSuelto();
+    pintarDiscreto();
 
     if (!window.IntersectionObserver) {
       cajas.forEach(pintar);

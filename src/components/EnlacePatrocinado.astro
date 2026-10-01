@@ -1,0 +1,53 @@
+---
+import { ENLACE_PATROCINADO } from "../lib/anuncios";
+
+interface Props {
+  /**
+   * `pie`: un enlace más entre los del pie, del mismo tamaño que los otros.
+   * `caja`: una línea recuadrada para la barra lateral de una noticia.
+   */
+  variante?: "pie" | "caja";
+  clase?: string;
+}
+
+const { variante = "caja", clase = "" } = Astro.props;
+
+/**
+ * Enlace directo de la red, puesto como enlace corriente: rotulado como
+ * patrocinado, sin dispararse solo y sin colgarse del clic de otros enlaces.
+ * `rel="sponsored"` es lo que piden los buscadores para un enlace pagado.
+ * Se apaga con ANUNCIOS=0, igual que el resto de la publicidad.
+ */
+const activo = import.meta.env.ANUNCIOS !== "0";
+---
+
+{
+  activo && variante === "pie" && (
+    <a
+      href={ENLACE_PATROCINADO}
+      target="_blank"
+      rel="sponsored nofollow noopener"
+      class:list={["opacity-75 transition hover:opacity-100", clase]}
+    >
+      Sponsored ↗
+    </a>
+  )
+}
+
+{
+  activo && variante === "caja" && (
+    <aside class:list={["w-full", clase]} aria-label="Sponsored">
+      <span class="mb-1 block text-[0.6rem] uppercase tracking-widest text-[var(--color-tinta-tenue)]">
+        Sponsored
+      </span>
+      <a
+        href={ENLACE_PATROCINADO}
+        target="_blank"
+        rel="sponsored nofollow noopener"
+        class="block rounded-lg border border-[var(--color-linea)] bg-[var(--color-lienzo)] px-4 py-3 text-sm text-[var(--color-tinta-suave)] transition hover:border-[var(--color-marca)] hover:text-[var(--color-marca)]"
+      >
+        Discover more from our partners →
+      </a>
+    </aside>
+  )
+}

@@ -1,6 +1,7 @@
 ---
 import type { Indice } from "../lib/types";
 import Marca from "./Marca.astro";
+import EnlacePatrocinado from "./EnlacePatrocinado.astro";
 import { SITIO } from "../lib/sitio";
 import {
   colorCategoria,
@@ -103,6 +104,7 @@ const año = new Date().getFullYear();
         <a href="/search" class="opacity-75 transition hover:opacity-100">Search</a>
         <a href="/rss.xml" class="opacity-75 transition hover:opacity-100">RSS</a>
         <a href="/sitemap.xml" class="opacity-75 transition hover:opacity-100">Sitemap</a>
+        <EnlacePatrocinado variante="pie" />
       </nav>
     </div>
     <div class="contenedor pb-8">
