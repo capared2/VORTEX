@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>You're offline · Gigantum.net</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!--
+      Lo que enseña el service worker cuando no hay conexión. Va todo dentro
+      del propio fichero --sin hojas ni fuentes de fuera-- porque sin red no
+      llegaría nada más.
+    -->
+    <style>
+      :root {
+        color-scheme: light dark;
+        --papel: #f6f7fa;
+        --tinta: #0f1115;
+        --suave: #4b5364;
+        --marca: #4f46e5;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --papel: #08090c;
+          --tinta: #eef1f7;
+          --suave: #a5aec0;
+          --marca: #8b8cff;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 2rem 1.25rem;
+        background: var(--papel);
+        color: var(--tinta);
+        font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        text-align: center;
+        -webkit-tap-highlight-color: transparent;
+      }
+      main {
+        max-width: 22rem;
+      }
+      .filete {
+        display: flex;
+        gap: 3px;
+        height: 4px;
+        margin: 0 auto 1.75rem;
+        width: 6rem;
+      }
+      .filete span {
+        flex: 1;
+        border-radius: 2px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0.6rem 0 1.6rem;
+        color: var(--suave);
+      }
+      button {
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        padding: 0.8rem 1.6rem;
+        background: var(--marca);
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:active {
+        transform: scale(0.97);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="filete" aria-hidden="true">
+        <span style="background: #2f6df6"></span>
+        <span style="background: #12a150"></span>
+        <span style="background: #0e9bb8"></span>
+        <span style="background: #8b5cf6"></span>
+      </div>
+      <h1>You're offline</h1>
+      <p>Gigantum needs a connection to bring you the latest stories. Check your signal and try again.</p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </main>
+    <script>
+      // En cuanto vuelve la red, se recarga sola.
+      addEventListener("online", () => location.reload());
+    </script>
+  </body>
+</html>

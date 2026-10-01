@@ -5,6 +5,8 @@ import Pie from "../components/Pie.astro";
 import Seo from "../components/Seo.astro";
 import Anuncios from "../components/Anuncios.astro";
 import Analitica from "../components/Analitica.astro";
+import BarraApp from "../components/BarraApp.astro";
+import Menu from "../components/Menu.astro";
 import type { Indice } from "../lib/types";
 import { SITIO } from "../lib/sitio";
 
@@ -30,6 +32,8 @@ interface Props {
    */
   idioma?: string;
   verticalActiva?: string;
+  /** En móvil, adónde vuelve la flecha de la cabecera si se llegó de fuera. */
+  atras?: string;
   imagen?: string | null;
   imagenAlt?: string | null;
   tipo?: "website" | "article";
@@ -51,8 +55,35 @@ const {
   cache = 900,
   idioma = SITIO.idioma,
   verticalActiva,
+  atras,
   ...seo
 } = Astro.props;
+
+/**
+ * Precarga de la siguiente página al tocar un enlace, antes de levantar el
+ * dedo: en un teléfono son las décimas que separan una web de una aplicación.
+ * Solo se descarga el HTML --no se ejecuta nada--, así que ni cuenta visitas
+ * ni pide anuncios. Las imágenes y los ficheros sueltos se quedan fuera.
+ */
+const PRECARGA = JSON.stringify({
+  prefetch: [
+    {
+      where: {
+        and: [
+          { href_matches: "/*" },
+          { not: { href_matches: "/img/*" } },
+          { not: { href_matches: "/*.xml" } },
+          { not: { href_matches: "/*.txt" } },
+        ],
+      },
+      eagerness: "conservative",
+    },
+  ],
+});
+
+// El service worker solo sirve la página sin conexión. En desarrollo estorba
+// más que ayuda: se quedaría con la versión vieja de las páginas.
+const conServiceWorker = import.meta.env.PROD;
 
 // El dataset se regenera cada dos horas: servir desde el edge y revalidar en
 // segundo plano mantiene el sitio rápido sin quedarse obsoleto.
@@ -66,7 +97,9 @@ Astro.response.headers.set(
 <html lang={idioma}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- `viewport-fit=cover` deja pintar bajo la muesca; los márgenes seguros
+         se reservan en las barras de arriba y de abajo. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <Seo titulo={titulo} descripcion={descripcion} canonical={canonical} idioma={idioma} {...seo} />
 
     <Analitica />
@@ -92,8 +125,23 @@ Astro.response.headers.set(
     />
     <noscript><link href={FUENTES} rel="stylesheet" /></noscript>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
-    <meta name="theme-color" content="#4f46e5" />
+    <!--
+      Instalable como aplicación: con el manifiesto, Android ofrece añadirla a
+      la pantalla de inicio y se abre en su propia ventana, sin la barra del
+      navegador. iOS no lee el manifiesto para todo y pide sus propias
+      etiquetas, y un icono PNG: el SVG lo ignora y hace una captura de la web.
+    -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Gigantum" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- Del color de la cabecera y no de la marca, para que la barra del
+         navegador y la del sitio se lean como una sola. El guion de abajo la
+         cambia si el tema es oscuro. -->
+    <meta name="theme-color" content="#ffffff" />
+    <script is:inline type="speculationrules" set:html={PRECARGA} />
 
     <script is:inline>
       // Si una foto no llega, se quita del flujo en vez de enseñar el icono
@@ -123,6 +171,9 @@ Astro.response.headers.set(
           ? guardado === "oscuro"
           : matchMedia("(prefers-color-scheme: dark)").matches;
         document.documentElement.classList.toggle("oscuro", oscuro);
+        if (oscuro) {
+          document.querySelector('meta[name="theme-color"]')?.setAttribute("content", "#12141a");
+        }
       } catch {
         // Almacenamiento bloqueado: se queda con el tema del sistema.
       }
@@ -136,14 +187,27 @@ Astro.response.headers.set(
       Skip to content
     </a>
 
-    <Cabecera indice={indice} verticalActiva={verticalActiva} />
+    <Cabecera indice={indice} verticalActiva={verticalActiva} atras={atras} />
 
-    <main id="contenido" class="contenedor w-full flex-1 py-7">
+    <main id="contenido" class="contenedor w-full flex-1 py-5 md:py-7">
       <slot />
     </main>
 
     <Pie indice={indice} />
 
+    <BarraApp verticalActiva={verticalActiva} inicio={canonical === "/"} />
+    <Menu indice={indice} />
+
     <Anuncios />
+
+    {
+      conServiceWorker && (
+        <script is:inline>
+          if ("serviceWorker" in navigator) {
+            addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+          }
+        </script>
+      )
+    }
   </body>
 </html>

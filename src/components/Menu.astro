@@ -1,0 +1,291 @@
+---
+import type { Indice } from "../lib/types";
+import { SITIO } from "../lib/sitio";
+import {
+  colorCategoria,
+  colorVertical,
+  enlaceCategoria,
+  enlaceVertical,
+  fechaLarga,
+  nombreTema,
+  nombreVertical,
+} from "../lib/formato";
+
+interface Props {
+  indice: Indice | null;
+}
+
+const { indice } = Astro.props;
+const verticales = (indice?.verticals ?? []).map((v) => v.vertical);
+const nichos = verticales.length ? verticales : ["news", "sports", "gaming", "tech"];
+const temasDe = (vertical: string) =>
+  (indice?.categories ?? []).filter((c) => c.vertical === vertical);
+const hoy = fechaLarga(new Date());
+---
+
+<!--
+  El menú del móvil: una hoja que sube desde abajo.
+
+  Es un `<dialog>` modal, así que el foco queda dentro mientras está abierto,
+  Escape lo cierra y el lector de pantalla sabe que es una ventana. Se cierra
+  también tocando fuera, deslizándolo hacia abajo y con el botón de volver de
+  Android, que es lo primero que prueba cualquiera en un teléfono.
+
+  En el escritorio no hay botón que lo abra: allí la cabecera ya lo enseña todo.
+-->
+<dialog id="menu" class="hoja" aria-label="Menu">
+  <div class="hoja-asa" data-asa aria-hidden="true"><span></span></div>
+
+  <div class="flex items-center justify-between px-5 pb-2">
+    <p class="text-[0.68rem] uppercase tracking-[0.14em] text-[var(--color-tinta-tenue)]">{hoy}</p>
+    <button
+      type="button"
+      data-cerrar-menu
+      class="-mr-2 rounded-full p-2 text-[var(--color-tinta-suave)] active:bg-[var(--color-lienzo-alt)]"
+      aria-label="Close menu"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M6 6l12 12M18 6 6 18"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="hoja-cuerpo px-5 pb-6">
+    <form action="/search" method="get" role="search" class="relative">
+      <label for="q-menu" class="sr-only">Search the news</label>
+      <svg class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[var(--color-tinta-tenue)]" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m20 20-3.5-3.5" stroke-linecap="round"></path>
+      </svg>
+      <input
+        id="q-menu"
+        type="search"
+        name="q"
+        placeholder="Search the news"
+        enterkeyhint="search"
+        class="w-full rounded-xl border border-[var(--color-linea)] bg-[var(--color-lienzo-alt)] py-2.5 pr-3 pl-10 text-[1rem] outline-none focus:border-[var(--color-marca)]"
+      />
+    </form>
+
+    <nav aria-label="Sections and topics" class="mt-5 space-y-5">
+      {
+        nichos.map((clave) => (
+          <section>
+            <a
+              href={enlaceVertical(clave)}
+              class="flex items-center justify-between border-b-2 pb-1.5"
+              style={`border-color:${colorVertical(clave)}`}
+            >
+              <span
+                class="font-display text-sm font-extrabold uppercase tracking-[0.1em]"
+                style={`color:${colorVertical(clave)}`}
+              >
+                {nombreVertical(clave)}
+              </span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[var(--color-tinta-tenue)]" aria-hidden="true">
+                <path d="m9 6 6 6-6 6"></path>
+              </svg>
+            </a>
+            {temasDe(clave).length > 0 && (
+              <ul class="mt-2.5 flex flex-wrap gap-2">
+                {temasDe(clave).map((c) => (
+                  <li>
+                    <a
+                      href={enlaceCategoria(c.category)}
+                      class="chip-tema !px-3 !py-1.5 !text-[0.7rem]"
+                      style={`--acento:${colorCategoria(c.category)}`}
+                    >
+                      {nombreTema(c.category)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ))
+      }
+    </nav>
+
+    <ul class="hoja-lista mt-6">
+      <li>
+        <button type="button" data-cambiar-tema class="hoja-fila" role="switch" aria-checked="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+          </svg>
+          <span class="flex-1 text-left">Dark mode</span>
+          <span class="interruptor" aria-hidden="true"></span>
+        </button>
+      </li>
+      <li hidden data-instalar>
+        <button type="button" class="hoja-fila">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"></path>
+          </svg>
+          <span class="flex-1 text-left">Install the app</span>
+        </button>
+      </li>
+      <li hidden data-instalar-ios>
+        <div class="hoja-fila">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3.5v11M8 7.5l4-4 4 4M7 11H5.5v9.5h13V11H17"></path>
+          </svg>
+          <span class="flex-1 text-left text-sm">
+            To install, tap <strong>Share</strong> and then <strong>Add to Home Screen</strong>.
+          </span>
+        </div>
+      </li>
+      <li>
+        <a href="/topics" class="hoja-fila">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="6.5" height="6.5" rx="1.5"></rect><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"></rect>
+            <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"></rect><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"></rect>
+          </svg>
+          <span class="flex-1">All topics</span>
+        </a>
+      </li>
+      <li>
+        <a href="/rss.xml" class="hoja-fila">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M5 11a8 8 0 0 1 8 8M5 5a14 14 0 0 1 14 14"></path><circle cx="6" cy="18" r="1.3" fill="currentColor"></circle>
+          </svg>
+          <span class="flex-1">RSS feed</span>
+        </a>
+      </li>
+    </ul>
+
+    <p class="mt-6 text-xs leading-relaxed text-[var(--color-tinta-tenue)]">
+      © {new Date().getFullYear()} {SITIO.nombre}. Content gathered automatically from external
+      sources; rights to each text belong to whoever originally published it.
+    </p>
+  </div>
+</dialog>
+
+<script>
+  const hoja = document.getElementById("menu") as HTMLDialogElement | null;
+
+  if (hoja) {
+    const CERRANDO = "cerrando";
+    let conHistoria = false;
+
+    function abrir() {
+      if (!hoja || hoja.open) return;
+      hoja.showModal();
+      // Una entrada de historial propia: así el botón de volver de Android
+      // cierra el menú en vez de sacar al lector de la página.
+      history.pushState({ menu: true }, "");
+      conHistoria = true;
+      document.querySelectorAll("[data-abrir-menu]").forEach((b) => b.setAttribute("aria-expanded", "true"));
+    }
+
+    // Cierra de verdad, con la animación de bajada.
+    function bajar() {
+      if (!hoja || !hoja.open || hoja.classList.contains(CERRANDO)) return;
+      hoja.classList.add(CERRANDO);
+      const fin = () => {
+        hoja.classList.remove(CERRANDO);
+        hoja.style.transform = "";
+        hoja.close();
+      };
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) fin();
+      else hoja.addEventListener("animationend", fin, { once: true });
+      document.querySelectorAll("[data-abrir-menu]").forEach((b) => b.setAttribute("aria-expanded", "false"));
+    }
+
+    // Toda salida pasa por aquí: si el menú dejó una entrada en el historial,
+    // se gasta volviendo atrás y `popstate` hace el resto.
+    function cerrar() {
+      if (conHistoria && history.state?.menu) history.back();
+      else bajar();
+    }
+
+    addEventListener("popstate", () => {
+      conHistoria = false;
+      bajar();
+    });
+
+    // Al volver a esta página con el botón de atrás, el navegador la puede
+    // restaurar tal cual se dejó, con el menú abierto. Se cierra sin animar.
+    addEventListener("pageshow", (e) => {
+      if (e.persisted && hoja.open) {
+        conHistoria = false;
+        hoja.close();
+      }
+    });
+
+    document.querySelectorAll("[data-abrir-menu]").forEach((b) => b.addEventListener("click", abrir));
+    hoja.querySelectorAll("[data-cerrar-menu]").forEach((b) => b.addEventListener("click", cerrar));
+
+    // Escape: el navegador lo cerraría de golpe; se cierra igual que con la X.
+    hoja.addEventListener("cancel", (e) => {
+      e.preventDefault();
+      cerrar();
+    });
+
+    // Un toque fuera de la hoja cae en el propio `<dialog>`, que ocupa el fondo.
+    hoja.addEventListener("click", (e) => {
+      if (e.target === hoja) cerrar();
+    });
+
+    // Deslizar hacia abajo desde el asa o con el contenido arriba del todo.
+    const cuerpo = hoja.querySelector<HTMLElement>(".hoja-cuerpo");
+    let inicioY: number | null = null;
+    let desplazado = 0;
+
+    hoja.addEventListener(
+      "touchstart",
+      (e) => {
+        const desdeAsa = (e.target as Element).closest("[data-asa]");
+        if (!desdeAsa && cuerpo && cuerpo.scrollTop > 0) return;
+        inicioY = e.touches[0].clientY;
+        desplazado = 0;
+      },
+      { passive: true },
+    );
+
+    hoja.addEventListener(
+      "touchmove",
+      (e) => {
+        if (inicioY === null) return;
+        desplazado = Math.max(0, e.touches[0].clientY - inicioY);
+        hoja.style.transition = "none";
+        hoja.style.transform = desplazado ? `translateY(${desplazado}px)` : "";
+      },
+      { passive: true },
+    );
+
+    hoja.addEventListener("touchend", () => {
+      if (inicioY === null) return;
+      inicioY = null;
+      hoja.style.transition = "";
+      if (desplazado > 90) cerrar();
+      else hoja.style.transform = "";
+    });
+
+    // Instalar como aplicación. Chrome avisa con `beforeinstallprompt` cuando
+    // se puede; Safari no tiene ese aviso y se explica el gesto a mano.
+    let aviso: (Event & { prompt: () => Promise<void> }) | null = null;
+    const filaInstalar = hoja.querySelector<HTMLElement>("[data-instalar]");
+
+    addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      aviso = e as typeof aviso;
+      if (filaInstalar) filaInstalar.hidden = false;
+    });
+
+    filaInstalar?.querySelector("button")?.addEventListener("click", async () => {
+      if (!aviso) return;
+      await aviso.prompt();
+      aviso = null;
+      filaInstalar.hidden = true;
+    });
+
+    addEventListener("appinstalled", () => {
+      if (filaInstalar) filaInstalar.hidden = true;
+    });
+
+    const enApp = matchMedia("(display-mode: standalone)").matches || (navigator as { standalone?: boolean }).standalone;
+    const esIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const filaIos = hoja.querySelector<HTMLElement>("[data-instalar-ios]");
+    if (filaIos && esIos && !enApp) filaIos.hidden = false;
+  }
+</script>

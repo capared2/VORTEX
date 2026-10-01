@@ -359,11 +359,337 @@
   border-left: 3px solid var(--acento, var(--color-marca));
 }
 
+/* Fila que se desliza de lado en vez de partirse en varias líneas: en el
+   móvil, una lista de temas que ocupa media pantalla antes de la primera
+   noticia se convierte en un carril de una sola línea, como en una app. */
+@utility carril {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 1.25rem;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & > * {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+}
+
+/* ---- El sitio como aplicación en el móvil ------------------------------
+   Todo lo de aquí abajo es para pantallas por debajo de `md`, donde la
+   cabecera se queda en una barra, las secciones bajan a una barra de
+   pestañas y el resto va a un menú en hoja. En el escritorio no cambia nada.
+
+   Va en `@layer components` y no suelto: suelto ganaría a las utilidades y
+   un `md:hidden` puesto en el HTML dejaría de esconder nada. */
+@layer base {
+  html {
+    /* Sin el recuadro gris que pinta el navegador al tocar: cada control
+       tiene su propia respuesta al toque. */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  a,
+  button,
+  summary {
+    touch-action: manipulation;
+  }
+
+  /* Con el menú abierto, lo de detrás no se mueve. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  @media (max-width: 767.98px) {
+    /* Hueco para la barra de pestañas, que va fija encima del contenido. */
+    body {
+      padding-bottom: calc(3.6rem + env(safe-area-inset-bottom));
+    }
+  }
+}
+
+@layer components {
+  .barra-superior {
+    padding-top: env(safe-area-inset-top);
+    view-transition-name: barra-superior;
+  }
+
+  @media (max-width: 767.98px) {
+    .barra-superior {
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .barra-superior[data-oculta] {
+      transform: translateY(-100%);
+    }
+  }
+
+  /* Botón de icono con área de toque de 44 px, la mínima para un dedo. */
+  .boton-app {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    color: var(--color-tinta-suave);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .boton-app:active {
+    background: var(--color-lienzo-alt);
+  }
+
+  @media (hover: hover) {
+    .boton-app:hover {
+      color: var(--color-marca);
+    }
+  }
+
+  /* Barra de pestañas */
+  .barra-app {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 40;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--color-linea);
+    /* Opaca: translúcida, los titulares que pasan por debajo se mezclaban
+       con los nombres de las pestañas. */
+    background: var(--color-lienzo);
+    /* Es parte de la aplicación, no del documento: nada de seleccionar su
+       texto ni del menú de "abrir en pestaña nueva" al mantener pulsado. */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    view-transition-name: barra-app;
+  }
+
+  .pestana {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    min-height: 3.6rem;
+    padding: 0.45rem 0 0.4rem;
+    color: var(--color-tinta-tenue);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .pestana-icono {
+    display: grid;
+    place-items: center;
+    width: 3.4rem;
+    height: 1.9rem;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+  }
+
+  .pestana:active .pestana-icono {
+    transform: scale(0.9);
+  }
+
+  .pestana[data-activa] {
+    color: var(--acento, var(--color-marca));
+  }
+
+  .pestana[data-activa] .pestana-icono {
+    background: color-mix(in oklab, var(--acento, var(--color-marca)) 16%, transparent);
+  }
+
+  .pestana[data-activa] svg {
+    stroke-width: 2.2;
+  }
+
+  /* Hoja del menú: un `<dialog>` pegado abajo que sube al abrirse. */
+  .hoja {
+    margin: auto 0 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: min(88dvh, 100% - 2.5rem);
+    padding: 0 0 env(safe-area-inset-bottom);
+    border: 0;
+    border-radius: 1.25rem 1.25rem 0 0;
+    background: var(--color-lienzo);
+    color: var(--color-tinta);
+    box-shadow: 0 -12px 40px -12px rgb(0 0 0 / 0.35);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .hoja[open] {
+    display: flex;
+    flex-direction: column;
+    animation: hoja-sube 0.32s cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+
+  .hoja.cerrando {
+    animation: hoja-baja 0.22s ease-in forwards;
+  }
+
+  .hoja::backdrop {
+    background: rgb(8 9 12 / 0.45);
+    animation: velo-entra 0.3s ease;
+  }
+
+  .hoja.cerrando::backdrop {
+    animation: velo-sale 0.22s ease-in forwards;
+  }
+
+  .hoja-asa {
+    display: flex;
+    justify-content: center;
+    padding: 0.6rem 0 0.4rem;
+    touch-action: none;
+  }
+
+  .hoja-asa > span {
+    width: 2.4rem;
+    height: 0.3rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-tinta) 22%, transparent);
+  }
+
+  .hoja-cuerpo {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .hoja-lista {
+    overflow: hidden;
+    border-radius: 0.9rem;
+    background: var(--color-lienzo-alt);
+  }
+
+  .hoja-lista > li + li {
+    border-top: 1px solid var(--color-linea);
+  }
+
+  .hoja-fila {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-tinta);
+  }
+
+  .hoja-fila > svg {
+    flex-shrink: 0;
+    color: var(--color-tinta-suave);
+  }
+
+  a.hoja-fila:active,
+  button.hoja-fila:active {
+    background: color-mix(in oklab, var(--color-tinta) 7%, transparent);
+  }
+
+  /* Interruptor de encendido, el del tema oscuro. */
+  .interruptor {
+    position: relative;
+    flex-shrink: 0;
+    width: 2.6rem;
+    height: 1.55rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-tinta) 18%, transparent);
+    transition: background-color 0.2s ease;
+  }
+
+  .interruptor::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(1.55rem - 6px);
+    height: calc(1.55rem - 6px);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+    transition: transform 0.2s ease;
+  }
+
+  [aria-checked="true"] > .interruptor {
+    background: var(--color-marca);
+  }
+
+  [aria-checked="true"] > .interruptor::after {
+    transform: translateX(1.05rem);
+  }
+
+  /* En una pantalla táctil no hay "pasar por encima": la tarjeta responde al
+     dedo hundiéndose un poco, que es lo que hacen las aplicaciones. */
+  @media (hover: none) {
+    .tarjeta-tema {
+      transition: transform 0.12s ease;
+    }
+
+    .tarjeta-tema:active {
+      transform: scale(0.985);
+    }
+  }
+}
+
+@keyframes hoja-sube {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes hoja-baja {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes velo-entra {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes velo-sale {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Cambio de página con un fundido corto en lugar del parpadeo en blanco, y
+   las dos barras quietas mientras tanto, como en una app. Solo en el móvil:
+   en el escritorio la navegación sigue siendo la de una web. */
+@media (max-width: 767.98px) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.18s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

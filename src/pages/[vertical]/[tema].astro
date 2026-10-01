@@ -57,6 +57,7 @@ const hermanos = (indice?.categories ?? [])
   canonical={enlaceCategoria(clave, resultado.pagina)}
   indice={indice}
   verticalActiva={vertical}
+  atras={enlaceVertical(vertical)}
   cache={TTL.paginaListado}
   jsonLd={grafoTema(clave, resultado.articulos, resultado.pagina)}
   anterior={resultado.pagina > 1 ? enlaceCategoria(clave, resultado.pagina - 1) : null}
@@ -78,7 +79,7 @@ const hermanos = (indice?.categories ?? [])
     >
       {nombreVertical(vertical)}
     </a>
-    <h1 class="mt-1 font-display text-[2.6rem] font-black leading-none tracking-[-0.03em]">
+    <h1 class="mt-1 font-display text-[2.2rem] font-black leading-none tracking-[-0.03em] md:text-[2.6rem]">
       {nombre}
     </h1>
     <p class="mt-1 text-sm text-[var(--color-tinta-tenue)]">

@@ -1,0 +1,93 @@
+---
+import { colorVertical, enlaceVertical, nombreVertical } from "../lib/formato";
+
+interface Props {
+  /** Sección de la página, para encender su pestaña. */
+  verticalActiva?: string;
+  /** Si la página es la portada. */
+  inicio?: boolean;
+}
+
+const { verticalActiva, inicio = false } = Astro.props;
+
+/**
+ * Pestañas en un orden fijo, y no en el del índice como la cabecera: aquí van
+ * debajo del pulgar y la gente las encuentra por la posición. Si cambiaran de
+ * sitio cuando una sección pasa a tener más noticias que otra, cada visita
+ * habría que volver a buscarlas.
+ */
+const PESTANAS = ["news", "sports", "tech", "gaming"];
+
+// Trazos de 24×24 en `currentColor`, del mismo grueso que el resto de iconos.
+const ICONOS: Record<string, string> = {
+  inicio:
+    '<path d="M3.5 10.2 12 3.5l8.5 6.7V19a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-5v6H5A1.5 1.5 0 0 1 3.5 19Z"/>',
+  news:
+    '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h10A1.5 1.5 0 0 1 17 5.5V18a2.5 2.5 0 0 0 2.5 2.5H6.5A2.5 2.5 0 0 1 4 18Z"/>' +
+    '<path d="M17 9h2.5A1.5 1.5 0 0 1 21 10.5V18a2.5 2.5 0 0 1-2.5 2.5"/><path d="M7.5 8.5h6M7.5 12h6M7.5 15.5h4"/>',
+  sports:
+    '<circle cx="12" cy="12" r="8.5"/><path d="m12 7.6 3.5 2.6-1.3 4.1H9.8l-1.3-4.1Z"/>' +
+    '<path d="M12 7.6V3.5M15.5 10.2l4-1.3M14.2 14.3l2.4 3.4M9.8 14.3l-2.4 3.4M8.5 10.2l-4-1.3"/>',
+  tech:
+    '<rect x="6.5" y="6.5" width="11" height="11" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="0.8"/>' +
+    '<path d="M9.5 3.5v3M14.5 3.5v3M9.5 17.5v3M14.5 17.5v3M3.5 9.5h3M3.5 14.5h3M17.5 9.5h3M17.5 14.5h3"/>',
+  gaming:
+    '<path d="M7 7.5h10a4.5 4.5 0 0 1 4.5 4.5v2.2a3.3 3.3 0 0 1-6 1.9l-1-1.4h-5l-1 1.4a3.3 3.3 0 0 1-6-1.9V12A4.5 4.5 0 0 1 7 7.5Z"/>' +
+    '<path d="M7.5 10.5v3.5M5.75 12.25h3.5"/><path d="M15.5 11h.01M17.5 13h.01" stroke-width="2.6"/>',
+};
+
+const pestanas = [
+  { clave: "inicio", nombre: "Home", href: "/", acento: "var(--color-marca)", activa: inicio },
+  ...PESTANAS.map((clave) => ({
+    clave,
+    nombre: nombreVertical(clave),
+    href: enlaceVertical(clave),
+    acento: colorVertical(clave),
+    activa: verticalActiva === clave,
+  })),
+];
+---
+
+<!--
+  Barra de pestañas del móvil, como la de una aplicación.
+
+  Va abajo porque es donde llega el pulgar: en un teléfono la cabecera queda
+  al otro lado de la pantalla, y cambiar de sección no debería pedir estirar
+  la mano. Desde `md` desaparece y manda la cabecera de siempre.
+
+  La pestaña activa se enciende con el color de su sección, con una píldora
+  detrás del icono: es el gesto que la gente ya reconoce de las aplicaciones.
+-->
+<nav aria-label="Sections" class="barra-app md:hidden">
+  <ul class="grid grid-cols-5">
+    {
+      pestanas.map((p) => (
+        <li>
+          <a
+            href={p.href}
+            class="pestana"
+            aria-current={p.activa ? "page" : undefined}
+            data-activa={p.activa ? "" : undefined}
+            style={`--acento:${p.acento}`}
+          >
+            <span class="pestana-icono">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                set:html={ICONOS[p.clave]}
+              />
+            </span>
+            <span class="pestana-nombre">{p.nombre}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

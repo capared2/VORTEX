@@ -80,6 +80,7 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
   canonical={`/article/${noticia.category}/${noticia.id}`}
   indice={indice}
   verticalActiva={vertical}
+  atras={enlaceCategoria(noticia.category)}
   idioma={noticia.language || SITIO.idioma}
   cache={TTL.paginaNoticia}
   imagen={imagen}
@@ -146,6 +147,17 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
               <span>· updated {fecha(noticia.modified_at, true)}</span>
             )
           }
+          <button
+            type="button"
+            data-compartir
+            data-titulo={noticia.title}
+            class="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[var(--color-linea)] px-3 py-1.5 font-semibold text-[var(--color-tinta-suave)] transition active:bg-[var(--color-lienzo-alt)]"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3.5v11M8 7.5l4-4 4 4M7 11H5.5v9.5h13V11H17"></path>
+            </svg>
+            <span data-compartir-texto>Share</span>
+          </button>
         </div>
       </header>
 
@@ -265,3 +277,32 @@ const descripcion = recortar(noticia.summary || noticia.standfirst || noticia.bo
       tiene el ancho entero del contenedor en cualquier pantalla. */}
   <Banner hueco="horizontal" clase="mt-10" />
 </Base>
+
+<script>
+  // Compartir con la hoja nativa del teléfono, la misma de cualquier app.
+  // Donde no la hay (casi todo el escritorio) se copia el enlace.
+  document.querySelectorAll<HTMLButtonElement>("[data-compartir]").forEach((boton) => {
+    const texto = boton.querySelector("[data-compartir-texto]");
+    boton.addEventListener("click", async () => {
+      const url = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href ?? location.href;
+      const title = boton.dataset.titulo ?? document.title;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, url });
+        } catch {
+          // Cancelado por el lector: no hay nada que hacer.
+        }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        if (texto) {
+          texto.textContent = "Link copied";
+          setTimeout(() => (texto.textContent = "Share"), 2000);
+        }
+      } catch {
+        // Sin portapapeles: el enlace sigue en la barra de direcciones.
+      }
+    });
+  });
+</script>

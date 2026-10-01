@@ -36,12 +36,12 @@ const año = new Date().getFullYear();
   Repite el filete de cuatro colores de la cabecera: es lo que ata las dos
   puntas de la página.
 -->
-<footer class="mt-14 bg-[var(--color-cierre)] text-[var(--color-cierre-tinta)]">
+<footer class="mt-10 bg-[var(--color-cierre)] text-[var(--color-cierre-tinta)] md:mt-14">
   <div class="flex h-[3px]" aria-hidden="true">
     {nichos.map((clave) => <span class="flex-1" style={`background:${colorVertical(clave)}`} />)}
   </div>
 
-  <div class="contenedor grid gap-10 py-12 lg:grid-cols-[1.1fr_2fr]">
+  <div class="contenedor grid gap-10 py-8 md:py-12 lg:grid-cols-[1.1fr_2fr]">
     <div>
       <a href="/" class="inline-block text-white" aria-label={`${SITIO.nombre}, go to the front page`}>
         <Marca tamano="pie" />
@@ -64,7 +64,9 @@ const año = new Date().getFullYear();
       }
     </div>
 
-    <nav aria-label="Sections" class="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
+    <!-- En el móvil estas columnas ya están en el menú: aquí solo alargaban
+         la página. -->
+    <nav aria-label="Sections" class="grid grid-cols-2 gap-x-6 gap-y-8 max-md:hidden sm:grid-cols-4">
       {
         verticales.map((vertical) => (
           <div>

@@ -7,9 +7,14 @@ import { colorVertical, enlaceVertical, fechaLarga, nombreVertical } from "../li
 interface Props {
   indice: Indice | null;
   verticalActiva?: string;
+  /**
+   * En móvil, adónde lleva la flecha de volver si no hay de dónde volver
+   * (se llegó desde fuera). Sin ella no hay flecha.
+   */
+  atras?: string;
 }
 
-const { indice, verticalActiva } = Astro.props;
+const { indice, verticalActiva, atras } = Astro.props;
 
 // El orden lo marca el propio archivo: el nicho con más fondo va primero.
 const verticales = (indice?.verticals ?? []).map((v) => v.vertical);
@@ -28,8 +33,16 @@ const hoy = fechaLarga(new Date());
 
   La sección en la que estás se marca con un subrayado y no con una pastilla
   rellena. La pastilla es un control; el subrayado es una portada.
+
+  En el móvil se comporta como la barra de una aplicación: un solo piso con
+  la marca, buscar y el menú, que se aparta al bajar leyendo y vuelve en
+  cuanto se sube un poco. Las secciones pasan a la barra de pestañas de
+  abajo (BarraApp) y lo demás al menú.
 -->
-<header class="sticky top-0 z-40 bg-[var(--color-lienzo)]/97 backdrop-blur">
+<header
+  class="barra-superior sticky top-0 z-40 bg-[var(--color-lienzo)]/97 backdrop-blur"
+  data-barra
+>
   <!--
     El filete de cuatro colores, en el canto de arriba del todo. Es la firma de
     la marca --dice de un vistazo que aquí caben cuatro mundos y no uno-- y ata
@@ -42,8 +55,8 @@ const hoy = fechaLarga(new Date());
     {nichos.map((clave) => <span class="flex-1" style={`background:${colorVertical(clave)}`} />)}
   </div>
 
-  <!-- Piso de servicio -->
-  <div class="border-b border-[var(--color-linea)]">
+  <!-- Piso de servicio. En el móvil la fecha y el tema van en el menú. -->
+  <div class="hidden border-b border-[var(--color-linea)] md:block">
     <div
       class="contenedor flex h-8 items-center justify-between text-[0.68rem] text-[var(--color-tinta-tenue)]"
     >
@@ -54,6 +67,7 @@ const hoy = fechaLarga(new Date());
         <button
           id="tema"
           type="button"
+          data-cambiar-tema
           class="-mr-1 rounded p-1 transition hover:text-[var(--color-marca)]"
           aria-label="Switch between light and dark"
         >
@@ -67,8 +81,23 @@ const hoy = fechaLarga(new Date());
 
   <!-- Cabecera propiamente dicha -->
   <div
-    class="contenedor flex h-[3.35rem] items-center gap-7 border-b border-[var(--color-linea)]"
+    class="contenedor flex h-[3.35rem] items-center gap-2 border-b border-[var(--color-linea)] md:gap-7"
   >
+    {
+      atras && (
+        <a
+          href={atras}
+          data-atras
+          class="boton-app -ml-2 md:hidden"
+          aria-label="Back"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m15 5-7 7 7 7"></path>
+          </svg>
+        </a>
+      )
+    }
+
     <a href="/" class="shrink-0" aria-label={`${SITIO.nombre}, go to the front page`}>
       <Marca />
     </a>
@@ -106,46 +135,92 @@ const hoy = fechaLarga(new Date());
 
     <a
       href="/search"
-      class="ml-auto rounded-md p-2 text-[var(--color-tinta-suave)] transition hover:text-[var(--color-marca)] sm:hidden"
+      class="boton-app ml-auto sm:hidden"
       aria-label="Search"
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <circle cx="11" cy="11" r="7"></circle>
         <path d="m20 20-3.5-3.5" stroke-linecap="round"></path>
       </svg>
     </a>
+
+    <button
+      type="button"
+      data-abrir-menu
+      class="boton-app -mr-2 md:hidden"
+      aria-label="Menu"
+      aria-haspopup="dialog"
+      aria-controls="menu"
+      aria-expanded="false"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h10"></path>
+      </svg>
+    </button>
   </div>
-
-  <!-- Navegación de nichos en móvil: la cabecera no cabe entera. -->
-  <nav aria-label="Sections" class="border-t border-[var(--color-linea)] md:hidden">
-    <ul class="contenedor flex gap-5 overflow-x-auto py-1.5">
-      {
-        nichos.map((clave) => (
-          <li>
-            <a
-              href={enlaceVertical(clave)}
-              aria-current={verticalActiva === clave ? "page" : undefined}
-              data-activo={verticalActiva === clave ? "" : undefined}
-              class="nicho whitespace-nowrap"
-              style={`--acento:${colorVertical(clave)}`}
-            >
-              {nombreVertical(clave)}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
-
 </header>
 
 <script>
-  document.getElementById("tema")?.addEventListener("click", () => {
-    const oscuro = document.documentElement.classList.toggle("oscuro");
+  // Claro u oscuro. Hay un botón en la cabecera de escritorio y un interruptor
+  // en el menú del móvil: los dos hacen lo mismo y se mantienen al día.
+  const botonesTema = document.querySelectorAll<HTMLElement>("[data-cambiar-tema]");
+
+  function pintarTema() {
+    const oscuro = document.documentElement.classList.contains("oscuro");
+    botonesTema.forEach((b) => {
+      if (b.getAttribute("role") === "switch") b.setAttribute("aria-checked", String(oscuro));
+    });
+    // El color de la barra del navegador sigue al de la cabecera, como en
+    // una aplicación, y no al índigo de la marca.
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", oscuro ? "#12141a" : "#ffffff");
+  }
+
+  botonesTema.forEach((boton) =>
+    boton.addEventListener("click", () => {
+      const oscuro = document.documentElement.classList.toggle("oscuro");
+      try {
+        localStorage.setItem("tema", oscuro ? "oscuro" : "claro");
+      } catch {
+        // Almacenamiento bloqueado: el cambio vale solo para esta página.
+      }
+      pintarTema();
+    }),
+  );
+  pintarTema();
+
+  // En el móvil la barra se aparta al bajar y vuelve al subir: deja la
+  // pantalla entera para leer sin obligar a volver arriba para usarla.
+  const barra = document.querySelector<HTMLElement>("[data-barra]");
+  let ultimaY = scrollY;
+  addEventListener(
+    "scroll",
+    () => {
+      if (!barra) return;
+      const y = scrollY;
+      const paso = y - ultimaY;
+      // Los temblores del dedo no cuentan.
+      if (Math.abs(paso) < 8) return;
+      const escribiendo = barra.querySelector("input:focus") !== null;
+      barra.toggleAttribute("data-oculta", paso > 0 && y > 140 && !escribiendo);
+      ultimaY = y;
+    },
+    { passive: true },
+  );
+
+  // La flecha de volver hace lo que haría el botón del teléfono si se vino
+  // desde dentro del sitio; si se llegó de fuera, lleva a la sección.
+  document.querySelector<HTMLAnchorElement>("[data-atras]")?.addEventListener("click", (e) => {
+    let interna = false;
     try {
-      localStorage.setItem("tema", oscuro ? "oscuro" : "claro");
+      interna = new URL(document.referrer).origin === location.origin;
     } catch {
-      // Almacenamiento bloqueado: el cambio vale solo para esta página.
+      // Sin referente: se llegó de fuera o se abrió en una pestaña nueva.
+    }
+    if (interna && history.length > 1) {
+      e.preventDefault();
+      history.back();
     }
   });
 </script>

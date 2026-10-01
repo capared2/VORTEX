@@ -25,11 +25,13 @@ const acento = grande ? "var(--color-marca)" : "var(--color-cierre-marca)";
   uno por su cuenta y se habían ido separando.
 -->
 <span class="flex shrink-0 items-center gap-2.5">
-  <Logo clase={grande ? "h-8 w-8" : "h-7 w-7"} />
+  <Logo clase={grande ? "h-7 w-7 md:h-8 md:w-8" : "h-7 w-7"} />
   <span
     class:list={[
       "font-display font-black leading-none tracking-[-0.035em]",
-      grande ? "text-[1.6rem]" : "text-xl",
+      // En el móvil la cabecera es una barra de aplicación: la marca baja un
+      // punto para dejar sitio a los botones sin apretarse contra ellos.
+      grande ? "text-[1.4rem] md:text-[1.6rem]" : "text-xl",
     ]}
   >
     Gigantum<span

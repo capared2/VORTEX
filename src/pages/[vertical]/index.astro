@@ -70,7 +70,7 @@ const acento = colorVertical(vertical);
   -->
   <header class="portadilla mb-6" style={`--acento:${acento}`}>
     <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-      <h1 class="font-display text-[2.6rem] font-black leading-none tracking-[-0.03em]">
+      <h1 class="font-display text-[2.2rem] font-black leading-none tracking-[-0.03em] md:text-[2.6rem]">
         {nombre}
       </h1>
       <p class="text-sm text-[var(--color-tinta-tenue)]">
@@ -82,7 +82,10 @@ const acento = colorVertical(vertical);
       </p>
     </div>
 
-    <nav aria-label={`${nombre} topics`} class="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+    <nav
+      aria-label={`${nombre} topics`}
+      class="mt-4 flex flex-wrap gap-x-5 gap-y-2 max-md:carril max-md:-mx-5 max-md:px-5 max-md:pb-1"
+    >
       {
         temas.map((tema) => (
           <a
